@@ -1,0 +1,3997 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ArenaScore Pro — Placar Multiesportivo & Súmula Oficial PDF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #070b14;
+      --bg-panel: #101726;
+      --bg-panel-alt: #162033;
+      --bg-glass: rgba(16, 23, 38, 0.88);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-sport: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --team-a: #3b82f6;
+      --team-b: #ef4444;
+      --gold: #f59e0b;
+      --cyan: #06b6d4;
+      --danger: #ef4444;
+      --warning: #eab308;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #172542 0%, var(--bg-main) 65%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding-bottom: 48px;
+      overflow-x: hidden;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(7, 11, 20, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-sport), #059669);
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .autosave-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sport-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-panel);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      overflow-x: auto;
+    }
+
+    .sport-tab {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .sport-tab.active {
+      background: var(--accent-sport);
+      color: #04130d;
+      font-weight: 700;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-panel-alt);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: 9px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-action:hover {
+      border-color: rgba(255,255,255,0.24);
+      transform: translateY(-1px);
+    }
+
+    .btn-action.active-toggle {
+      border-color: var(--accent-sport);
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+    }
+
+    .btn-referee-highlight {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: rgba(56, 189, 248, 0.14);
+      color: #7dd3fc;
+    }
+
+    .btn-pdf-highlight {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #090d16;
+      border: none;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 1280px;
+      margin: 18px auto 0;
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ALERT BANNER */
+    .alert-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      animation: pulseAlert 1.4s infinite;
+    }
+
+    .alert-banner.show {
+      display: flex;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.82; transform: scale(0.995); }
+    }
+
+    /* SCOREBOARD GRID */
+    .scoreboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1020px) {
+      .scoreboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .center-console {
+        order: -1;
+      }
+    }
+
+    /* TEAM CARD */
+    .team-card {
+      background: linear-gradient(180deg, var(--bg-panel) 0%, #0b101d 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .team-card.team-a {
+      border-top: 4px solid var(--team-a);
+    }
+
+    .team-card.team-b {
+      border-top: 4px solid var(--team-b);
+    }
+
+    .team-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .team-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* TEAM SHIELD / BADGE BUTTON */
+    .team-shield-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, border-color 0.2s ease;
+    }
+
+    .team-shield-btn:hover {
+      transform: scale(1.05);
+      border-color: var(--gold);
+    }
+
+    .team-shield-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .team-shield-monogram {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+
+    .shield-edit-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(7, 11, 20, 0.85);
+      font-size: 0.62rem;
+      padding: 1px 4px;
+      border-top-left-radius: 5px;
+    }
+
+    .color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    .team-name-input {
+      background: transparent;
+      border: 1px dashed transparent;
+      color: var(--text-primary);
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 1.38rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 6px;
+    }
+
+    .team-name-input:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .serve-indicator {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      cursor: pointer;
+    }
+
+    .serve-indicator.active {
+      display: inline-flex;
+    }
+
+    .score-display-wrap {
+      text-align: center;
+      margin: 12px 0 8px;
+      position: relative;
+    }
+
+    .score-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(4.2rem, 8vw, 6.2rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -2px;
+      text-shadow: 0 0 28px rgba(255, 255, 255, 0.14);
+    }
+
+    .sets-pill {
+      display: none;
+      margin: 6px auto 0;
+      width: fit-content;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fde68a;
+    }
+
+    .team-scorers-box {
+      min-height: 44px;
+      max-height: 82px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 7px 10px;
+      margin-bottom: 12px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .scorer-chip {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .scorer-chip strong {
+      color: #fbbf24;
+    }
+
+    .score-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .btn-score {
+      border: none;
+      border-radius: 11px;
+      padding: 12px 10px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: var(--bg-panel-alt);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+
+    .btn-score:active {
+      transform: scale(0.96);
+    }
+
+    .btn-score.primary-a {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .btn-score.primary-b {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .btn-score.minus {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .stats-subgrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 520px) {
+      .stats-subgrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 4px 0;
+    }
+
+    .foul-dots {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 6px;
+      min-height: 8px;
+    }
+
+    .foul-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+    }
+
+    .foul-dot.filled {
+      background: var(--warning);
+    }
+
+    .foul-dot.cyan {
+      background: var(--cyan);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.7);
+    }
+
+    .foul-dot.danger {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+    }
+
+    .mini-btns {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-mini {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-mini.timeout-btn {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: #06b6d4;
+      color: #67e8f9;
+    }
+
+    .btn-mini.yellow {
+      background: rgba(234, 179, 8, 0.2);
+      border-color: #eab308;
+      color: #fde047;
+    }
+
+    .btn-mini.red {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* CENTER CONSOLE */
+    .center-console {
+      background: linear-gradient(180deg, #131c2e 0%, #0b111e 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .period-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .period-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #38bdf8;
+      letter-spacing: 0.6px;
+    }
+
+    .timer-box {
+      width: 100%;
+      background: #050811;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 12px 10px 10px;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timer-edit-hint {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .timer-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3.3rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #10b981;
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+      line-height: 1.05;
+    }
+
+    .timer-digits.running {
+      color: #34d399;
+    }
+
+    .timer-digits.paused {
+      color: #fbbf24;
+    }
+
+    .added-time-badge {
+      display: none;
+      margin-top: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .quick-adjust-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .btn-quick-time {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: #cbd5e1;
+      border-radius: 6px;
+      padding: 4px 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .timeout-active-box {
+      display: none;
+      width: 100%;
+      background: rgba(6, 182, 212, 0.14);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      animation: pulseAlert 1.5s infinite;
+    }
+
+    .timeout-active-box.show {
+      display: block;
+    }
+
+    .timeout-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #67e8f9;
+      margin: 4px 0;
+    }
+
+    .timer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .btn-timer {
+      flex: 1;
+      min-width: 82px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      color: #06130e;
+      background: var(--accent-sport);
+    }
+
+    .btn-timer.secondary {
+      background: var(--bg-panel-alt);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* SHOT CLOCK (BASKETBALL) */
+    .shotclock-panel {
+      display: none;
+      width: 100%;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .shotclock-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    /* VOLLEYBALL SETS BAR */
+    .sets-history-bar {
+      display: none;
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sets-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .set-chip {
+      background: rgba(255,255,255,0.08);
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    /* PENALTY SHOOTOUT PANEL */
+    .penalties-panel {
+      display: none;
+      background: linear-gradient(180deg, #11192c 0%, #0b111e 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .penalties-panel.open {
+      display: block;
+    }
+
+    .penalties-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 780px) {
+      .penalties-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .penalty-team-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .penalty-kicks-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+      align-items: center;
+    }
+
+    .kick-slot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.22);
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .kick-slot.goal {
+      border: 2px solid #10b981;
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .kick-slot.miss {
+      border: 2px solid #ef4444;
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .kick-slot.sudden {
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.45);
+    }
+
+    .penalty-score-center {
+      text-align: center;
+      padding: 8px 16px;
+      background: #060a14;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .penalty-big-digits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    /* REFEREE SUMMARY BANNER CARD */
+    .referee-preview-card {
+      background: linear-gradient(180deg, #10192b 0%, #0b111e 100%);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .referee-preview-text {
+      font-size: 0.84rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+      max-width: 820px;
+    }
+
+    /* BOTTOM PANELS (STATS & TIMELINE) */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-list {
+      max-height: 270px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+    }
+
+    .timeline-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.09);
+      color: #cbd5e1;
+    }
+
+    .stats-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .player-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.03);
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+    }
+
+    /* LOWER THIRD TV BANNER */
+    .lower-third {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translate(-50%, 140%);
+      z-index: 90;
+      background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+      border-left: 6px solid var(--accent-sport);
+      border-radius: 12px;
+      padding: 12px 22px;
+      min-width: 310px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lower-third.active {
+      transform: translate(-50%, 0);
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(3, 6, 14, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #11192b;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 580px;
+      padding: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .modal-card.wide {
+      max-width: 840px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .referee-officials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .timer-edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: #090e1a;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      user-select: text;
+    }
+
+    .input-field.big-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-align: center;
+      color: #34d399;
+    }
+
+    textarea.input-field {
+      resize: vertical;
+      min-height: 115px;
+      line-height: 1.48;
+      user-select: text;
+    }
+
+    .bulk-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .roster-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 14px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .roster-chip {
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .roster-chip:hover {
+      background: var(--accent-sport);
+      color: #04130d;
+    }
+
+    .ref-quick-chip {
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      background: rgba(56, 189, 248, 0.1);
+      color: #bae6fd;
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .ref-quick-chip:hover {
+      background: rgba(56, 189, 248, 0.25);
+      color: #fff;
+    }
+
+    /* SHIELD PRESET GALLERY */
+    .shield-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .shield-preset-item {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .shield-preset-item:hover {
+      border-color: var(--gold);
+      background: rgba(245, 158, 11, 0.14);
+    }
+
+    /* PDF PREVIEW AREA INSIDE MODAL */
+    .pdf-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .pdf-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn-pdf-Option {
+      flex: 1;
+      min-width: 160px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-share-native {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #04130d;
+    }
+
+    .btn-download-pdf {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #090d16;
+    }
+
+    .btn-whatsapp-txt {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .pdf-canvas-preview-wrap {
+      background: #090d16;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    #sumulaCanvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🏆</div>
+      <span>ARENASCORE <small style="color:var(--accent-sport);font-size:0.75rem;">PRO</small></span>
+      <span class="autosave-pill" id="autosavePill">💾 Salvo</span>
+    </div>
+
+    <div class="sport-tabs" id="sportTabs">
+      <button class="sport-tab active" data-sport="futebol">⚽ Futebol</button>
+      <button class="sport-tab" data-sport="futsal">👟 Futsal</button>
+      <button class="sport-tab" data-sport="volei">🏐 Vôlei</button>
+      <button class="sport-tab" data-sport="basquete">🏀 Basquete</button>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn-action active-toggle" id="btnToggleAthlete" title="Solicitar Número/Nome ao pontuar">
+        👤 Atleta: ON
+      </button>
+      <button class="btn-action" id="btnTogglePenalties" title="Abrir/Fechar disputa de pênaltis ou tiros livres">
+        🥅 Pênaltis
+      </button>
+      <button class="btn-action btn-referee-highlight" id="btnOpenRefereeModal" title="Preencher Relatório da Arbitragem e Ocorrências">
+        📝 Arbitragem
+      </button>
+      <button class="btn-action" id="btnSwapSides" title="Inverter lados das equipes">
+        ⇄ Inverter
+      </button>
+      <button class="btn-action" id="btnBuzzer" title="Tocar buzina/apito">
+        🔊 Buzina
+      </button>
+      <button class="btn-action btn-pdf-highlight" id="btnOpenPdfModal">
+        📄 Gerar PDF / Compartilhar
+      </button>
+      <button class="btn-action" id="btnResetMatch" title="Opções de reinício">
+        ↺ Reset
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- DYNAMIC ALERT BANNER -->
+    <div class="alert-banner" id="alertBanner"></div>
+
+    <!-- MAIN SCOREBOARD -->
+    <section class="scoreboard-grid">
+      <!-- TEAM A -->
+      <div class="team-card team-a" id="cardTeamA">
+        <div>
+          <div class="team-header">
+            <div class="team-name-wrap">
+              <div class="team-shield-btn" id="shieldBtnA" onclick="openShieldModal('A')" title="Alterar Escudo da Equipe A">
+                <span class="team-shield-monogram" id="shieldMonoA">EF</span>
+                <span class="shield-edit-badge">🛡️</span>
+              </div>
+              <input type="color" id="colorA" value="#3b82f6" class="color-dot" title="Cor da Equipe A" />
+              <input type="text" id="nameA" class="team-name-input" value="ELITE FJU" />
+            </div>
+            <div class="serve-indicator" id="serveA" onclick="setServe('A')">🏐 SAQUE</div>
+            <button class="btn-mini" onclick="openRosterModal('A')">📋 Elenco (<span id="rosterCountA">3</span>)</button>
+          </div>
+
+          <div class="score-display-wrap">
+            <div class="score-digits" id="scoreA">0</div>
+            <div class="sets-pill" id="setsPillA">SETS: <span id="setsA">0</span></div>
+          </div>
+
+          <div class="team-scorers-box" id="scorersBoxA">
+            <span style="opacity:0.55;">Nenhum lance registrado ainda</span>
+          </div>
+
+          <div class="score-controls" id="scoreControlsA"></div>
+        </div>
+
+        <div class="stats-subgrid">
+          <div class="stat-box">
+            <div class="stat-label">Faltas</div>
+            <div class="stat-val" id="foulsA">0</div>
+            <div class="foul-dots" id="foulDotsA"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeFouls('A', -1)">-</button>
+              <button class="btn-mini" onclick="changeFouls('A', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Tempos</div>
+            <div class="stat-val" style="color:#67e8f9;" id="timeoutsA">0/1</div>
+            <div class="foul-dots" id="timeoutDotsA"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeTimeout('A', -1)">-</button>
+              <button class="btn-mini timeout-btn" onclick="requestTeamTimeout('A')" title="Pedir Tempo Técnico">+ ⏱</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Amarelos</div>
+            <div class="stat-val" style="color:#fde047;" id="yellowA">0</div>
+            <div class="foul-dots"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeCard('A', 'yellow', -1)">-</button>
+              <button class="btn-mini yellow" onclick="triggerCardPrompt('A', 'yellow')">+ 🟨</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Vermelhos</div>
+            <div class="stat-val" style="color:#fca5a5;" id="redA">0</div>
+            <div class="foul-dots"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeCard('A', 'red', -1)">-</button>
+              <button class="btn-mini red" onclick="triggerCardPrompt('A', 'red')">+ 🟥</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER CONSOLE -->
+      <div class="center-console">
+        <div class="period-selector">
+          <button class="btn-mini" onclick="changePeriod(-1)">◀</button>
+          <span class="period-title" id="periodLabel">1º TEMPO</span>
+          <button class="btn-mini" onclick="changePeriod(1)">▶</button>
+        </div>
+
+        <div class="timer-box" onclick="openTimerEditModal()" title="Clique para editar os minutos e segundos do cronômetro">
+          <span class="timer-edit-hint">✏️ Editar</span>
+          <div class="timer-digits" id="timerDisplay">45:00</div>
+          <div class="added-time-badge" id="addedTimeBadge">+0' ACRÉSCIMO</div>
+        </div>
+
+        <div class="quick-adjust-bar">
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(-60)">-1m</button>
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(-10)">-10s</button>
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(-1)">-1s</button>
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(1)">+1s</button>
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(10)">+10s</button>
+          <button class="btn-quick-time" onclick="adjustTimerSeconds(60)">+1m</button>
+        </div>
+
+        <div class="timeout-active-box" id="timeoutActiveBox">
+          <div class="stat-label" style="color:#67e8f9;" id="timeoutTeamLabel">⏱ TEMPO TÉCNICO — EQUIPE</div>
+          <div class="timeout-digits" id="timeoutTimerDisplay">01:00</div>
+          <button class="btn-mini" onclick="stopTimeoutCountdown()">✕ Encerrar Tempo Técnico</button>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn-timer" id="btnStartPause" onclick="toggleTimer()">▶ INICIAR</button>
+          <button class="btn-timer secondary" onclick="openTimerEditModal()">✏️ Editar</button>
+          <button class="btn-timer secondary" onclick="resetPeriodTimer()">↺ Tempo</button>
+        </div>
+
+        <div class="timer-controls" id="extraCenterControls">
+          <button class="btn-action" id="btnAddMinute" onclick="addStoppageTime(1)">+1' Acréscimo</button>
+          <button class="btn-action" id="btnReduceMinute" onclick="addStoppageTime(-1)">-1' Acrésc.</button>
+          <button class="btn-action" id="btnTimerDirection" onclick="toggleTimerDirection()">⏳ Regressivo</button>
+        </div>
+
+        <!-- BASKETBALL 24s SHOT CLOCK -->
+        <div class="shotclock-panel" id="shotclockPanel">
+          <div class="stat-label">POSSE DE BOLA (24s / 14s)</div>
+          <div class="shotclock-digits" id="shotclockDisplay">24</div>
+          <div class="mini-btns" style="margin-top:6px;">
+            <button class="btn-mini" onclick="resetShotClock(24)">24s</button>
+            <button class="btn-mini" onclick="resetShotClock(14)">14s</button>
+            <button class="btn-mini" onclick="adjustShotClock(-1)">-1s</button>
+            <button class="btn-mini" onclick="adjustShotClock(1)">+1s</button>
+          </div>
+        </div>
+
+        <!-- VOLLEYBALL SETS -->
+        <div class="sets-history-bar" id="setsHistoryBar">
+          <div class="stat-label" style="text-align:center;">PARCIAIS DOS SETS</div>
+          <div class="sets-chips" id="setsChipsList">
+            <span style="font-size:0.75rem;color:var(--text-secondary);">Sem sets finalizados</span>
+          </div>
+          <button class="btn-action" style="justify-content:center;width:100%;" onclick="finishVolleySet()">
+            ✅ Encerrar Set Atual
+          </button>
+        </div>
+      </div>
+
+      <!-- TEAM B -->
+      <div class="team-card team-b" id="cardTeamB">
+        <div>
+          <div class="team-header">
+            <div class="team-name-wrap">
+              <div class="team-shield-btn" id="shieldBtnB" onclick="openShieldModal('B')" title="Alterar Escudo da Equipe B">
+                <span class="team-shield-monogram" id="shieldMonoB">VI</span>
+                <span class="shield-edit-badge">🛡️</span>
+              </div>
+              <input type="color" id="colorB" value="#ef4444" class="color-dot" title="Cor da Equipe B" />
+              <input type="text" id="nameB" class="team-name-input" value="VISITANTE" />
+            </div>
+            <div class="serve-indicator" id="serveB" onclick="setServe('B')">🏐 SAQUE</div>
+            <button class="btn-mini" onclick="openRosterModal('B')">📋 Elenco (<span id="rosterCountB">2</span>)</button>
+          </div>
+
+          <div class="score-display-wrap">
+            <div class="score-digits" id="scoreB">0</div>
+            <div class="sets-pill" id="setsPillB">SETS: <span id="setsB">0</span></div>
+          </div>
+
+          <div class="team-scorers-box" id="scorersBoxB">
+            <span style="opacity:0.55;">Nenhum lance registrado ainda</span>
+          </div>
+
+          <div class="score-controls" id="scoreControlsB"></div>
+        </div>
+
+        <div class="stats-subgrid">
+          <div class="stat-box">
+            <div class="stat-label">Faltas</div>
+            <div class="stat-val" id="foulsB">0</div>
+            <div class="foul-dots" id="foulDotsB"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeFouls('B', -1)">-</button>
+              <button class="btn-mini" onclick="changeFouls('B', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Tempos</div>
+            <div class="stat-val" style="color:#67e8f9;" id="timeoutsB">0/1</div>
+            <div class="foul-dots" id="timeoutDotsB"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeTimeout('B', -1)">-</button>
+              <button class="btn-mini timeout-btn" onclick="requestTeamTimeout('B')" title="Pedir Tempo Técnico">+ ⏱</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Amarelos</div>
+            <div class="stat-val" style="color:#fde047;" id="yellowB">0</div>
+            <div class="foul-dots"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeCard('B', 'yellow', -1)">-</button>
+              <button class="btn-mini yellow" onclick="triggerCardPrompt('B', 'yellow')">+ 🟨</button>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Vermelhos</div>
+            <div class="stat-val" style="color:#fca5a5;" id="redB">0</div>
+            <div class="foul-dots"></div>
+            <div class="mini-btns">
+              <button class="btn-mini" onclick="changeCard('B', 'red', -1)">-</button>
+              <button class="btn-mini red" onclick="triggerCardPrompt('B', 'red')">+ 🟥</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PENALTY SHOOTOUT / FREE THROWS PANEL -->
+    <section class="penalties-panel" id="penaltiesPanel">
+      <div class="panel-header" style="margin-bottom:8px;">
+        <div class="panel-title">🥅 Disputa de Pênaltis / Tiros Livres</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="penaltyStatusBadge" style="font-size:0.8rem;font-weight:700;color:#fbbf24;">Série Inicial (5 cobranças)</span>
+          <button class="btn-mini" onclick="resetPenalties()">↺ Zerar Pênaltis</button>
+          <button class="btn-mini" onclick="togglePenaltiesPanel()">✕</button>
+        </div>
+      </div>
+
+      <div class="penalties-grid">
+        <div class="penalty-team-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong id="penHeaderA" style="color:#60a5fa;">ELITE FJU</strong>
+            <button class="btn-mini" onclick="undoLastPenalty('A')" title="Desfazer última cobrança">↩️</button>
+          </div>
+          <div class="penalty-kicks-row" id="penKicksA"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-action" style="flex:1;justify-content:center;background:rgba(16,185,129,0.2);border-color:#10b981;color:#34d399;" onclick="handlePenaltyClick('A', true)">
+              ✅ Converteu
+            </button>
+            <button class="btn-action" style="flex:1;justify-content:center;background:rgba(239,68,68,0.2);border-color:#ef4444;color:#fca5a5;" onclick="handlePenaltyClick('A', false)">
+              ❌ Perdeu / Defendeu
+            </button>
+          </div>
+        </div>
+
+        <div class="penalty-score-center">
+          <div class="stat-label">PÊNALTIS</div>
+          <div class="penalty-big-digits"><span id="penScoreA">0</span> × <span id="penScoreB">0</span></div>
+          <div style="font-size:0.72rem;color:var(--text-secondary);" id="penRoundHint">1ª a 5ª cobrança</div>
+        </div>
+
+        <div class="penalty-team-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong id="penHeaderB" style="color:#f87171;">VISITANTE</strong>
+            <button class="btn-mini" onclick="undoLastPenalty('B')" title="Desfazer última cobrança">↩️</button>
+          </div>
+          <div class="penalty-kicks-row" id="penKicksB"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-action" style="flex:1;justify-content:center;background:rgba(16,185,129,0.2);border-color:#10b981;color:#34d399;" onclick="handlePenaltyClick('B', true)">
+              ✅ Converteu
+            </button>
+            <button class="btn-action" style="flex:1;justify-content:center;background:rgba(239,68,68,0.2);border-color:#ef4444;color:#fca5a5;" onclick="handlePenaltyClick('B', false)">
+              ❌ Perdeu / Defendeu
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RELATÓRIO DA ARBITRAGEM (BARRA DE RESUMO RÁPIDO) -->
+    <section class="referee-preview-card">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex:1;">
+        <div style="font-size:1.6rem;">📝</div>
+        <div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.98rem;color:#7dd3fc;">
+            RELATÓRIO DA ARBITRAGEM — <span id="refPreviewStatusBadge" style="color:#34d399;">Partida Normal</span>
+          </div>
+          <div class="referee-preview-text" id="refPreviewSummary">
+            Clique em "Editar Relatório" para registrar observações disciplinares, motivos de cartões, condições da partida e equipe de arbitragem (será incluído na Súmula PDF).
+          </div>
+        </div>
+      </div>
+      <button class="btn-action btn-referee-highlight" onclick="openRefereeModal()">
+        ✏️ Editar Relatório da Arbitragem
+      </button>
+    </section>
+
+    <!-- BOTTOM TIMELINE & INDIVIDUAL STATS -->
+    <section class="bottom-grid">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">⚡ Linha do Tempo da Partida</div>
+          <span style="font-size:0.78rem;color:var(--text-secondary);" id="eventsCountLabel">0 eventos</span>
+        </div>
+        <div class="timeline-list" id="timelineList">
+          <div style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:20px 0;">
+            Os gols, pontos, pedidos de tempo, pênaltis e cartões aparecerão aqui.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">🏅 Artilharia & Estatísticas por Atleta</div>
+          <button class="btn-mini" onclick="openPdfModal()">📄 Exportar Súmula PDF</button>
+        </div>
+        <div class="stats-columns">
+          <div>
+            <div style="font-size:0.8rem;font-weight:700;color:#60a5fa;margin-bottom:6px;" id="statsHeaderA">ELITE FJU</div>
+            <div id="playerStatsA"></div>
+          </div>
+          <div>
+            <div style="font-size:0.8rem;font-weight:700;color:#f87171;margin-bottom:6px;" id="statsHeaderB">VISITANTE</div>
+            <div id="playerStatsB"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- LOWER THIRD TV NOTIFICATION -->
+  <div class="lower-third" id="lowerThird">
+    <div style="font-size:1.9rem;" id="ltIcon">⚽</div>
+    <div>
+      <div style="font-size:0.74rem;font-weight:800;color:var(--accent-sport);text-transform:uppercase;" id="ltSubtitle">GOL CONFIRMADO</div>
+      <div style="font-family:'Chakra Petch',sans-serif;font-size:1.15rem;font-weight:700;" id="ltTitle">#10 ATLETA</div>
+    </div>
+  </div>
+
+  <!-- MODAL: RELATÓRIO DA ARBITRAGEM -->
+  <div class="modal-backdrop" id="refereeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title">📝 Relatório Oficial da Arbitragem</div>
+        <button class="btn-mini" onclick="closeRefereeModal()">✕</button>
+      </div>
+
+      <div class="referee-officials-grid">
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);display:block;margin-bottom:4px;">Árbitro Principal</label>
+          <input type="text" id="refMainInput" class="input-field" placeholder="Nome do Árbitro" />
+        </div>
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);display:block;margin-bottom:4px;">2º Árbitro / Auxiliar</label>
+          <input type="text" id="refAuxInput" class="input-field" placeholder="Nome do Auxiliar" />
+        </div>
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);display:block;margin-bottom:4px;">Mesário / Anotador</label>
+          <input type="text" id="refTableInput" class="input-field" placeholder="Nome do Mesário" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:0.74rem;color:var(--text-secondary);display:block;margin-bottom:4px;">Situação Disciplinar / Enquadramento da Partida</label>
+        <select id="refStatusSelect" class="input-field">
+          <option value="Partida Normal (Sem incidentes)">✅ Partida Normal (Sem incidentes)</option>
+          <option value="Ocorrência Disciplinar / Expulsão">🟥 Ocorrência Disciplinar / Expulsão</option>
+          <option value="Atraso / Paralisação Técnica">⏱️ Atraso / Paralisação Técnica</option>
+          <option value="Atendimento Médico / Lesão">🏥 Atendimento Médico / Lesão</option>
+          <option value="W.O. / Encerramento Antecipado">🚫 W.O. / Encerramento Antecipado</option>
+        </select>
+      </div>
+
+      <div style="font-size:0.76rem;color:var(--text-secondary);margin-bottom:6px;font-weight:600;">
+        ⚡ Inserir observação padrão em 1 clique:
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Partida transcorreu dentro da normalidade técnica e disciplinar.')">
+          + Normalidade disciplinar
+        </button>
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Cartão vermelho aplicado em decorrência do segundo cartão amarelo.')">
+          + Expulsão (2º Amarelo)
+        </button>
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Expulsão direta por conduta antidesportiva / falta grave.')">
+          + Expulsão Direta
+        </button>
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Atraso no início da partida aguardando apresentação das equipes.')">
+          + Atraso no início
+        </button>
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Atendimento médico realizado em quadra/campo sem gravidade.')">
+          + Atendimento médico
+        </button>
+        <button type="button" class="ref-quick-chip" onclick="appendRefereeTemplate('Nada mais havendo a relatar, encerro o presente relatório.')">
+          + Encerramento padrão
+        </button>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <label style="font-size:0.76rem;color:var(--text-secondary);">Relato Detalhado e Ocorrências da Partida</label>
+          <button type="button" class="btn-mini" onclick="document.getElementById('refNotesTextarea').value = ''">Limpar Texto</button>
+        </div>
+        <textarea id="refNotesTextarea" class="input-field" placeholder="Descreva aqui observações do árbitro, motivos de expulsões (nº camisa e nome), atrasos, condições da quadra/campo ou ocorrências relevantes..."></textarea>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;">
+        <button class="btn-action" onclick="closeRefereeModal()">Cancelar</button>
+        <button class="btn-action" onclick="saveRefereeReport(false)">💾 Salvar Relatório</button>
+        <button class="btn-action btn-pdf-highlight" onclick="saveRefereeReport(true)">📄 Salvar e Ver Súmula PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ESCUDO / LOGO DA EQUIPE -->
+  <div class="modal-backdrop" id="shieldModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title" id="shieldModalTitle">🛡️ Escudo da Equipe</div>
+        <button class="btn-mini" onclick="closeShieldModal()">✕</button>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label class="btn-action btn-pdf-highlight" style="width:100%;justify-content:center;padding:12px;">
+          📸 Escolher Imagem / Logo da Galeria
+          <input type="file" id="shieldFileInput" accept="image/*" style="display:none;" onchange="handleShieldUpload(event)" />
+        </label>
+      </div>
+
+      <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:6px;">
+        Ou selecione um emblema esportivo pronto:
+      </div>
+
+      <div class="shield-presets-grid">
+        <div class="shield-preset-item" onclick="applyPresetShield('🏆')">🏆<br>Campeão</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('🦁')">🦁<br>Leão</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('🦅')">🦅<br>Águia</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('⚡')">⚡<br>Raio</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('🔥')">🔥<br>Fogo</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('👑')">👑<br>Coroa</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('⚽')">⚽<br>Futebol</div>
+        <div class="shield-preset-item" onclick="applyPresetShield('🏀')">🏀<br>Basquete</div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px;">
+        <button class="btn-action" onclick="clearTeamShield()">🔤 Usar Iniciais (Monograma)</button>
+        <button class="btn-action" onclick="closeShieldModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RESET PARTIDA -->
+  <div class="modal-backdrop" id="resetModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title">↺ Reiniciar Partida</div>
+        <button class="btn-mini" onclick="closeResetModal()">✕</button>
+      </div>
+      <p style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:14px;">
+        Escolha o que deseja reiniciar no placar:
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn-action btn-pdf-highlight" style="justify-content:center;padding:12px;" onclick="executeReset(false)">
+          ⚽ Zerar Placar e Relatório (Manter Elencos e Escudos)
+        </button>
+        <button class="btn-action" style="justify-content:center;padding:12px;border-color:#ef4444;color:#fca5a5;" onclick="executeReset(true)">
+          🗑️ Resetar Tudo (Apagar Placar, Relatório, Elencos e Escudos)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR CRONÔMETRO -->
+  <div class="modal-backdrop" id="timerEditModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title">⏱️ Configurar / Editar Cronômetro</div>
+        <button class="btn-mini" onclick="closeTimerEditModal()">✕</button>
+      </div>
+
+      <div style="margin-bottom:8px;font-size:0.82rem;color:var(--text-secondary);">
+        Tempos rápidos pré-definidos:
+      </div>
+
+      <div class="roster-chips" style="margin-bottom:14px;">
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(5, 0)">5 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(7, 0)">7 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(8, 0)">8 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(10, 0)">10 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(12, 0)">12 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(15, 0)">15 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(20, 0)">20 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(25, 0)">25 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(30, 0)">30 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(35, 0)">35 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(40, 0)">40 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(45, 0)">45 min</button>
+        <button type="button" class="roster-chip" onclick="setModalPresetTime(0, 0)">00:00</button>
+      </div>
+
+      <div class="timer-edit-grid">
+        <div>
+          <label style="font-size:0.76rem;color:var(--text-secondary);display:block;margin-bottom:4px;">Minutos (MM)</label>
+          <input type="number" id="editTimerMin" class="input-field big-time" min="0" max="199" value="45" />
+        </div>
+        <div>
+          <label style="font-size:0.76rem;color:var(--text-secondary);display:block;margin-bottom:4px;">Segundos (SS)</label>
+          <input type="number" id="editTimerSec" class="input-field big-time" min="0" max="59" value="0" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.84rem;color:#e2e8f0;cursor:pointer;">
+          <input type="checkbox" id="chkSaveAsDefault" checked style="width:16px;height:16px;accent-color:var(--accent-sport);" />
+          Usar também como tempo padrão ao reiniciar o período (↺ Tempo)
+        </label>
+      </div>
+
+      <div style="margin-bottom:16px;padding-top:10px;border-top:1px solid var(--border-subtle);">
+        <label style="font-size:0.76rem;color:var(--text-secondary);display:block;margin-bottom:6px;">
+          Duração do Pedido de Tempo Técnico (Segundos)
+        </label>
+        <input type="number" id="editTimeoutDuration" class="input-field" min="10" max="300" value="60" />
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn-action" onclick="closeTimerEditModal()">Cancelar</button>
+        <button class="btn-action btn-pdf-highlight" onclick="applyTimerEdit()">✅ Aplicar Tempo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IDENTIFICAR ATLETA -->
+  <div class="modal-backdrop" id="athleteModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title" id="athleteModalTitle">⚽ Registrar Lance</div>
+        <button class="btn-mini" onclick="closeAthleteModal()">✕</button>
+      </div>
+
+      <div style="margin-bottom:10px;font-size:0.82rem;color:var(--text-secondary);">
+        Selecione um atleta do elenco em 1 clique ou digite o número e nome:
+      </div>
+
+      <div class="roster-chips" id="quickRosterChips"></div>
+
+      <div class="form-grid">
+        <div>
+          <label style="font-size:0.75rem;color:var(--text-secondary);">Nº Camisa</label>
+          <input type="text" id="inputPlayerNum" class="input-field" placeholder="Ex: 10" />
+        </div>
+        <div>
+          <label style="font-size:0.75rem;color:var(--text-secondary);">Nome do Atleta</label>
+          <input type="text" id="inputPlayerName" class="input-field" placeholder="Ex: Eduarda / Glória" />
+        </div>
+      </div>
+
+      <div id="volleySkillWrap" style="display:none;margin-bottom:14px;">
+        <label style="font-size:0.75rem;color:var(--text-secondary);display:block;margin-bottom:6px;">Fundamento do Ponto (Vôlei)</label>
+        <div class="mini-btns" style="justify-content:flex-start;flex-wrap:wrap;gap:6px;">
+          <button type="button" class="roster-chip skill-btn active" onclick="selectVolleySkill('Ataque', this)">⚡ Ataque</button>
+          <button type="button" class="roster-chip skill-btn" onclick="selectVolleySkill('Bloqueio', this)">🧱 Bloqueio</button>
+          <button type="button" class="roster-chip skill-btn" onclick="selectVolleySkill('Ace', this)">🎯 Ace</button>
+          <button type="button" class="roster-chip skill-btn" onclick="selectVolleySkill('Erro Adv.', this)">❌ Erro Adv.</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn-action" onclick="confirmAthleteEvent(true)">Pular Nome</button>
+        <button class="btn-action btn-pdf-highlight" onclick="confirmAthleteEvent(false)">✅ Confirmar Lance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ELENCO DA EQUIPE -->
+  <div class="modal-backdrop" id="rosterModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title" id="rosterModalTitle">📋 Gerenciar Elenco</div>
+        <button class="btn-mini" onclick="closeRosterModal()">✕</button>
+      </div>
+
+      <div class="bulk-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:0.84rem;font-weight:700;color:#34d399;">
+            ⚡ Adicionar Vários Atletas de Uma Vez
+          </span>
+          <span style="font-size:0.72rem;color:var(--text-secondary);">1 por linha (Nº e Nome)</span>
+        </div>
+        <textarea id="bulkRosterInput" class="input-field" placeholder="Cole do WhatsApp ou digite 1 atleta por linha. Exemplos:&#10;10 Eduarda&#10;7 - Glória&#10;9 Emily&#10;11 Beatriz"></textarea>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+          <button class="btn-action btn-pdf-highlight" style="flex:1;justify-content:center;" onclick="addBulkPlayersToRoster(false)">
+            ➕ Adicionar Todos ao Elenco
+          </button>
+          <button class="btn-action" style="justify-content:center;" onclick="addBulkPlayersToRoster(true)">
+            🔄 Substituir Elenco
+          </button>
+        </div>
+      </div>
+
+      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px;font-weight:600;">
+        Ou adicionar 1 atleta individualmente:
+      </div>
+      <div class="form-grid">
+        <input type="text" id="rosterNumInput" class="input-field" placeholder="Nº (Ex: 7)" />
+        <input type="text" id="rosterNameInput" class="input-field" placeholder="Nome do Atleta" />
+      </div>
+      <button class="btn-action" style="width:100%;justify-content:center;margin-bottom:14px;" onclick="addPlayerToRoster()">
+        ➕ Adicionar Atleta Individual
+      </button>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);" id="rosterModalCountLabel">
+          Atletas Cadastrados (0)
+        </span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-mini" onclick="copyRosterToClipboard()">📋 Copiar Lista</button>
+          <button class="btn-mini red" onclick="clearEntireRoster()">🗑️ Limpar Tudo</button>
+        </div>
+      </div>
+      <div id="rosterStatusMsg" style="font-size:0.78rem;color:#34d399;min-height:16px;margin-bottom:4px;"></div>
+      <div class="roster-chips" id="rosterManageList"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: GERAR PDF / COMPARTILHAR SÚMULA -->
+  <div class="modal-backdrop" id="pdfModal">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <div class="panel-title">📄 Súmula Oficial da Partida — Gerar PDF e Compartilhar</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn-mini" onclick="closePdfModal(); openRefereeModal();">📝 Editar Arbitragem</button>
+          <button class="btn-mini" onclick="closePdfModal()">✕</button>
+        </div>
+      </div>
+
+      <div class="pdf-meta-grid">
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);">Campeonato / Evento</label>
+          <input type="text" id="metaTourney" class="input-field" value="Copa / Amistoso Oficial" oninput="saveState(); renderSumulaCanvas();" />
+        </div>
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);">Local / Arena</label>
+          <input type="text" id="metaVenue" class="input-field" value="Areninha / Ginásio" oninput="saveState(); renderSumulaCanvas();" />
+        </div>
+        <div>
+          <label style="font-size:0.74rem;color:var(--text-secondary);">Árbitro Principal</label>
+          <input type="text" id="metaReferee" class="input-field" value="Coordenação Projeto FJU 3.5" oninput="syncRefereeFromPdfMeta()" />
+        </div>
+      </div>
+
+      <div class="pdf-actions-bar">
+        <button class="btn-pdf-Option btn-share-native" onclick="sharePdfFile()">
+          📲 Compartilhar PDF (WhatsApp / Apps)
+        </button>
+        <button class="btn-pdf-Option btn-download-pdf" onclick="downloadPdfFile()">
+          📥 Baixar PDF Oficial
+        </button>
+        <button class="btn-pdf-Option btn-whatsapp-txt" onclick="copyWhatsAppSummary()">
+          📋 Copiar Texto p/ WhatsApp
+        </button>
+      </div>
+
+      <div id="pdfStatusMsg" style="font-size:0.82rem;color:#34d399;margin-bottom:10px;text-align:center;min-height:18px;"></div>
+
+      <div class="pdf-canvas-preview-wrap">
+        <canvas id="sumulaCanvas" width="1240" height="1754"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'arenascore_pro_state_v2';
+
+    const SPORTS = {
+      futebol: {
+        name: 'Futebol de Campo',
+        icon: '⚽',
+        defaultMinutes: 45,
+        countdown: false,
+        periodName: 'TEMPO',
+        maxPeriods: 2,
+        foulLimit: null,
+        maxTimeouts: 1,
+        timeoutDuration: 60,
+        scoreButtons: [
+          { label: '+1 GOL', pts: 1 },
+          { label: '-1', pts: -1, minus: true }
+        ]
+      },
+      futsal: {
+        name: 'Futsal',
+        icon: '👟',
+        defaultMinutes: 20,
+        countdown: true,
+        periodName: 'TEMPO',
+        maxPeriods: 2,
+        foulLimit: 5,
+        maxTimeouts: 1,
+        timeoutDuration: 60,
+        scoreButtons: [
+          { label: '+1 GOL', pts: 1 },
+          { label: '-1', pts: -1, minus: true }
+        ]
+      },
+      volei: {
+        name: 'Voleibol',
+        icon: '🏐',
+        defaultMinutes: 0,
+        countdown: false,
+        periodName: 'SET',
+        maxPeriods: 5,
+        foulLimit: null,
+        maxTimeouts: 2,
+        timeoutDuration: 30,
+        scoreButtons: [
+          { label: '+1 PONTO', pts: 1 },
+          { label: '-1', pts: -1, minus: true }
+        ]
+      },
+      basquete: {
+        name: 'Basquete',
+        icon: '🏀',
+        defaultMinutes: 10,
+        countdown: true,
+        periodName: 'QUARTO',
+        maxPeriods: 4,
+        foulLimit: 5,
+        maxTimeouts: 2,
+        timeoutDuration: 60,
+        scoreButtons: [
+          { label: '+1', pts: 1 },
+          { label: '+2', pts: 2 },
+          { label: '+3', pts: 3 },
+          { label: '-1', pts: -1, minus: true }
+        ]
+      }
+    };
+
+    const state = {
+      sport: 'futebol',
+      askAthlete: true,
+      penaltiesOpen: false,
+      period: 1,
+      timerSeconds: 45 * 60,
+      customPeriodSeconds: 45 * 60,
+      countdown: false,
+      running: false,
+      stoppageMinutes: 0,
+      shotClock: 24,
+      serve: 'A',
+      setsHistory: [],
+      events: [],
+      pendingEvent: null,
+      activeRosterTeam: 'A',
+      activeShieldTeam: 'A',
+      selectedVolleySkill: 'Ataque',
+      timeoutRunning: false,
+      timeoutSecondsLeft: 0,
+      timeoutTeam: null,
+      meta: {
+        tourney: 'Copa / Amistoso Oficial',
+        venue: 'Areninha / Ginásio',
+        referee: 'Coordenação Projeto FJU 3.5'
+      },
+      refereeReport: {
+        mainReferee: 'Coordenação Projeto FJU 3.5',
+        auxReferee: '',
+        tableOfficial: '',
+        status: 'Partida Normal (Sem incidentes)',
+        notes: ''
+      },
+      teams: {
+        A: {
+          name: 'ELITE FJU',
+          color: '#3b82f6',
+          shieldData: '',
+          shieldEmoji: '',
+          score: 0,
+          sets: 0,
+          fouls: 0,
+          timeouts: 0,
+          yellow: 0,
+          red: 0,
+          penalties: [],
+          roster: [
+            { num: '10', name: 'Eduarda' },
+            { num: '7', name: 'Glória' },
+            { num: '9', name: 'Emily' }
+          ]
+        },
+        B: {
+          name: 'VISITANTE',
+          color: '#ef4444',
+          shieldData: '',
+          shieldEmoji: '',
+          score: 0,
+          sets: 0,
+          fouls: 0,
+          timeouts: 0,
+          yellow: 0,
+          red: 0,
+          penalties: [],
+          roster: [
+            { num: '8', name: 'Atleta 08' },
+            { num: '11', name: 'Atleta 11' }
+          ]
+        }
+      }
+    };
+
+    let timerInterval = null;
+    let timeoutInterval = null;
+    const loadedShieldImages = { A: null, B: null };
+
+    // =========================================================================
+    // SALVAMENTO AUTOMÁTICO (LOCALSTORAGE)
+    // =========================================================================
+    function saveState() {
+      try {
+        state.meta.tourney = document.getElementById('metaTourney')?.value || state.meta.tourney;
+        state.meta.venue = document.getElementById('metaVenue')?.value || state.meta.venue;
+        state.meta.referee = document.getElementById('metaReferee')?.value || state.meta.referee;
+
+        const snapshot = {
+          sport: state.sport,
+          askAthlete: state.askAthlete,
+          penaltiesOpen: state.penaltiesOpen,
+          period: state.period,
+          timerSeconds: state.timerSeconds,
+          customPeriodSeconds: state.customPeriodSeconds,
+          countdown: state.countdown,
+          stoppageMinutes: state.stoppageMinutes,
+          shotClock: state.shotClock,
+          serve: state.serve,
+          setsHistory: state.setsHistory,
+          events: state.events,
+          meta: state.meta,
+          refereeReport: state.refereeReport,
+          teams: state.teams
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+
+        const pill = document.getElementById('autosavePill');
+        if (pill) {
+          pill.textContent = '💾 Salvo';
+          pill.style.opacity = '1';
+        }
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const saved = JSON.parse(raw);
+        if (!saved || !saved.teams) return false;
+
+        Object.assign(state, saved);
+        if (!state.refereeReport) {
+          state.refereeReport = {
+            mainReferee: state.meta?.referee || '',
+            auxReferee: '',
+            tableOfficial: '',
+            status: 'Partida Normal (Sem incidentes)',
+            notes: ''
+          };
+        }
+        state.running = false;
+        state.timeoutRunning = false;
+
+        document.getElementById('nameA').value = state.teams.A.name;
+        document.getElementById('nameB').value = state.teams.B.name;
+        document.getElementById('colorA').value = state.teams.A.color;
+        document.getElementById('colorB').value = state.teams.B.color;
+        document.getElementById('cardTeamA').style.borderTopColor = state.teams.A.color;
+        document.getElementById('cardTeamB').style.borderTopColor = state.teams.B.color;
+
+        if (state.meta) {
+          document.getElementById('metaTourney').value = state.meta.tourney || '';
+          document.getElementById('metaVenue').value = state.meta.venue || '';
+          document.getElementById('metaReferee').value = state.refereeReport.mainReferee || state.meta.referee || '';
+        }
+
+        const btnAth = document.getElementById('btnToggleAthlete');
+        btnAth.textContent = state.askAthlete ? '👤 Atleta: ON' : '👤 Atleta: OFF';
+        btnAth.classList.toggle('active-toggle', state.askAthlete);
+
+        document.querySelectorAll('.sport-tab').forEach(b => {
+          b.classList.toggle('active', b.dataset.sport === state.sport);
+        });
+
+        preloadShieldImage('A');
+        preloadShieldImage('B');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // AUDIO SYNTHESIZER
+    function playSound(type = 'whistle') {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'buzzer') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(145, ctx.currentTime);
+          gain.gain.setValueAtTime(0.28, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.9);
+        } else {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(2600, ctx.currentTime);
+          osc.frequency.setValueAtTime(2850, ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.22, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.35);
+        }
+      } catch (e) {}
+    }
+
+    // INITIALIZATION
+    function init() {
+      document.querySelectorAll('.sport-tab').forEach(btn => {
+        btn.addEventListener('click', () => switchSport(btn.dataset.sport));
+      });
+
+      document.getElementById('btnToggleAthlete').addEventListener('click', () => {
+        state.askAthlete = !state.askAthlete;
+        const btn = document.getElementById('btnToggleAthlete');
+        btn.textContent = state.askAthlete ? '👤 Atleta: ON' : '👤 Atleta: OFF';
+        btn.classList.toggle('active-toggle', state.askAthlete);
+        saveState();
+      });
+
+      document.getElementById('btnTogglePenalties').addEventListener('click', togglePenaltiesPanel);
+      document.getElementById('btnOpenRefereeModal').addEventListener('click', openRefereeModal);
+      document.getElementById('btnSwapSides').addEventListener('click', swapTeams);
+      document.getElementById('btnBuzzer').addEventListener('click', () => playSound('buzzer'));
+      document.getElementById('btnOpenPdfModal').addEventListener('click', openPdfModal);
+      document.getElementById('btnResetMatch').addEventListener('click', openResetModal);
+
+      document.getElementById('nameA').addEventListener('input', e => {
+        state.teams.A.name = e.target.value.toUpperCase() || 'EQUIPE A';
+        updateShieldUI('A');
+        renderStatsAndTimeline();
+        renderPenaltiesUI();
+        saveState();
+      });
+      document.getElementById('nameB').addEventListener('input', e => {
+        state.teams.B.name = e.target.value.toUpperCase() || 'EQUIPE B';
+        updateShieldUI('B');
+        renderStatsAndTimeline();
+        renderPenaltiesUI();
+        saveState();
+      });
+
+      document.getElementById('colorA').addEventListener('input', e => {
+        state.teams.A.color = e.target.value;
+        document.getElementById('cardTeamA').style.borderTopColor = e.target.value;
+        updateShieldUI('A');
+        saveState();
+      });
+      document.getElementById('colorB').addEventListener('input', e => {
+        state.teams.B.color = e.target.value;
+        document.getElementById('cardTeamB').style.borderTopColor = e.target.value;
+        updateShieldUI('B');
+        saveState();
+      });
+
+      const restored = loadState();
+      if (restored) {
+        renderScoreButtons();
+        updateUI();
+      } else {
+        switchSport('futebol');
+      }
+    }
+
+    function switchSport(sportKey) {
+      stopTimer();
+      stopTimeoutCountdown();
+      state.sport = sportKey;
+      const cfg = SPORTS[sportKey];
+      state.period = 1;
+      state.countdown = cfg.countdown;
+      state.customPeriodSeconds = cfg.defaultMinutes * 60;
+      state.timerSeconds = state.customPeriodSeconds;
+      state.stoppageMinutes = 0;
+      state.shotClock = 24;
+      state.teams.A.timeouts = 0;
+      state.teams.B.timeouts = 0;
+
+      document.querySelectorAll('.sport-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.sport === sportKey);
+      });
+
+      renderScoreButtons();
+      updateUI();
+      saveState();
+    }
+
+    // =========================================================================
+    // RELATÓRIO DA ARBITRAGEM
+    // =========================================================================
+    function openRefereeModal() {
+      const r = state.refereeReport;
+      document.getElementById('refMainInput').value = r.mainReferee || document.getElementById('metaReferee').value || '';
+      document.getElementById('refAuxInput').value = r.auxReferee || '';
+      document.getElementById('refTableInput').value = r.tableOfficial || '';
+      document.getElementById('refStatusSelect').value = r.status || 'Partida Normal (Sem incidentes)';
+      document.getElementById('refNotesTextarea').value = r.notes || '';
+      document.getElementById('refereeModal').classList.add('open');
+    }
+
+    function closeRefereeModal() {
+      document.getElementById('refereeModal').classList.remove('open');
+    }
+
+    function appendRefereeTemplate(phrase) {
+      const ta = document.getElementById('refNotesTextarea');
+      const current = ta.value.trim();
+      ta.value = current ? `${current}\n${phrase}` : phrase;
+      ta.focus();
+    }
+
+    function saveRefereeReport(openPdfAfter = false) {
+      const mainRef = document.getElementById('refMainInput').value.trim();
+      state.refereeReport = {
+        mainReferee: mainRef,
+        auxReferee: document.getElementById('refAuxInput').value.trim(),
+        tableOfficial: document.getElementById('refTableInput').value.trim(),
+        status: document.getElementById('refStatusSelect').value,
+        notes: document.getElementById('refNotesTextarea').value.trim()
+      };
+      if (mainRef) {
+        state.meta.referee = mainRef;
+        document.getElementById('metaReferee').value = mainRef;
+      }
+      renderRefereePreview();
+      saveState();
+      closeRefereeModal();
+      if (openPdfAfter) {
+        openPdfModal();
+      }
+    }
+
+    function syncRefereeFromPdfMeta() {
+      const val = document.getElementById('metaReferee').value;
+      state.refereeReport.mainReferee = val;
+      saveState();
+      renderRefereePreview();
+      renderSumulaCanvas();
+    }
+
+    function renderRefereePreview() {
+      const r = state.refereeReport;
+      const statusBadge = document.getElementById('refPreviewStatusBadge');
+      const summaryEl = document.getElementById('refPreviewSummary');
+
+      statusBadge.textContent = r.status || 'Partida Normal (Sem incidentes)';
+      statusBadge.style.color = r.status && !r.status.includes('Normal') ? '#fbbf24' : '#34d399';
+
+      const officials = [];
+      if (r.mainReferee) officials.push(`Árbitro: ${r.mainReferee}`);
+      if (r.auxReferee) officials.push(`Auxiliar: ${r.auxReferee}`);
+      if (r.tableOfficial) officials.push(`Mesário: ${r.tableOfficial}`);
+
+      const headerLine = officials.length > 0 ? `[${officials.join(' | ')}] ` : '';
+      if (r.notes) {
+        summaryEl.textContent = headerLine + r.notes;
+      } else {
+        summaryEl.textContent = headerLine + 'Nenhuma observação disciplinar registrada até o momento. Clique em "Editar Relatório da Arbitragem" para preencher.';
+      }
+    }
+
+    // =========================================================================
+    // ESCUDOS / LOGOS DAS EQUIPES
+    // =========================================================================
+    function openShieldModal(teamKey) {
+      state.activeShieldTeam = teamKey;
+      document.getElementById('shieldModalTitle').textContent = `🛡️ Escudo — ${state.teams[teamKey].name}`;
+      document.getElementById('shieldModal').classList.add('open');
+    }
+
+    function closeShieldModal() {
+      document.getElementById('shieldModal').classList.remove('open');
+    }
+
+    function handleShieldUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const c = document.createElement('canvas');
+          c.width = 160;
+          c.height = 160;
+          const cx = c.getContext('2d');
+          cx.clearRect(0, 0, 160, 160);
+          const scale = Math.min(160 / img.width, 160 / img.height);
+          const w = img.width * scale;
+          const h = img.height * scale;
+          cx.drawImage(img, (160 - w) / 2, (160 - h) / 2, w, h);
+
+          const dataUrl = c.toDataURL('image/png', 0.9);
+          const k = state.activeShieldTeam;
+          state.teams[k].shieldData = dataUrl;
+          state.teams[k].shieldEmoji = '';
+          preloadShieldImage(k);
+          updateShieldUI(k);
+          saveState();
+          closeShieldModal();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function applyPresetShield(emoji) {
+      const k = state.activeShieldTeam;
+      state.teams[k].shieldData = '';
+      state.teams[k].shieldEmoji = emoji;
+      loadedShieldImages[k] = null;
+      updateShieldUI(k);
+      saveState();
+      closeShieldModal();
+    }
+
+    function clearTeamShield() {
+      const k = state.activeShieldTeam;
+      state.teams[k].shieldData = '';
+      state.teams[k].shieldEmoji = '';
+      loadedShieldImages[k] = null;
+      updateShieldUI(k);
+      saveState();
+      closeShieldModal();
+    }
+
+    function preloadShieldImage(teamKey) {
+      const data = state.teams[teamKey].shieldData;
+      if (!data) {
+        loadedShieldImages[teamKey] = null;
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        loadedShieldImages[teamKey] = img;
+      };
+      img.src = data;
+    }
+
+    function getTeamInitials(name) {
+      const parts = (name || 'EQ').trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return name.substring(0, 2).toUpperCase();
+    }
+
+    function updateShieldUI(teamKey) {
+      const btn = document.getElementById('shieldBtn' + teamKey);
+      const t = state.teams[teamKey];
+      btn.style.borderColor = t.color;
+
+      if (t.shieldData) {
+        btn.style.background = '#090e1a';
+        btn.innerHTML = `<img src="${t.shieldData}" alt="Escudo" /><span class="shield-edit-badge">🛡️</span>`;
+      } else if (t.shieldEmoji) {
+        btn.style.background = t.color + '33';
+        btn.innerHTML = `<span style="font-size:1.55rem;">${t.shieldEmoji}</span><span class="shield-edit-badge">🛡️</span>`;
+      } else {
+        btn.style.background = t.color + '44';
+        btn.innerHTML = `<span class="team-shield-monogram">${getTeamInitials(t.name)}</span><span class="shield-edit-badge">🛡️</span>`;
+      }
+    }
+
+    // =========================================================================
+    // DISPUTA DE PÊNALTIS / TIROS LIVRES
+    // =========================================================================
+    function togglePenaltiesPanel() {
+      state.penaltiesOpen = !state.penaltiesOpen;
+      document.getElementById('penaltiesPanel').classList.toggle('open', state.penaltiesOpen);
+      document.getElementById('btnTogglePenalties').classList.toggle('active-toggle', state.penaltiesOpen);
+      renderPenaltiesUI();
+      saveState();
+    }
+
+    function handlePenaltyClick(teamKey, isGoal) {
+      if (state.askAthlete) {
+        openAthleteModal({
+          team: teamKey,
+          kind: 'penalty',
+          isGoal: isGoal
+        });
+      } else {
+        commitEvent({
+          team: teamKey,
+          kind: 'penalty',
+          isGoal: isGoal,
+          playerNum: '',
+          playerName: ''
+        });
+      }
+    }
+
+    function undoLastPenalty(teamKey) {
+      if (state.teams[teamKey].penalties.length === 0) return;
+      state.teams[teamKey].penalties.pop();
+      const idx = state.events.findIndex(e => e.kind === 'penalty' && e.team === teamKey);
+      if (idx !== -1) state.events.splice(idx, 1);
+      updateUI();
+      saveState();
+    }
+
+    function resetPenalties() {
+      if (!confirm('Zerar todas as cobranças da disputa de pênaltis?')) return;
+      state.teams.A.penalties = [];
+      state.teams.B.penalties = [];
+      state.events = state.events.filter(e => e.kind !== 'penalty');
+      updateUI();
+      saveState();
+    }
+
+    function renderPenaltiesUI() {
+      const panel = document.getElementById('penaltiesPanel');
+      panel.classList.toggle('open', state.penaltiesOpen);
+      document.getElementById('btnTogglePenalties').classList.toggle('active-toggle', state.penaltiesOpen);
+
+      document.getElementById('penHeaderA').textContent = state.teams.A.name;
+      document.getElementById('penHeaderB').textContent = state.teams.B.name;
+
+      const penA = state.teams.A.penalties || [];
+      const penB = state.teams.B.penalties || [];
+      const goalsA = penA.filter(p => p.goal).length;
+      const goalsB = penB.filter(p => p.goal).length;
+
+      document.getElementById('penScoreA').textContent = goalsA;
+      document.getElementById('penScoreB').textContent = goalsB;
+
+      const totalSlots = Math.max(5, penA.length, penB.length);
+      ['A', 'B'].forEach(k => {
+        const list = state.teams[k].penalties || [];
+        const wrap = document.getElementById('penKicks' + k);
+        wrap.innerHTML = '';
+        for (let i = 0; i < totalSlots; i++) {
+          const slot = document.createElement('div');
+          const isSudden = i >= 5;
+          if (i < list.length) {
+            const kick = list[i];
+            slot.className = 'kick-slot ' + (kick.goal ? 'goal' : 'miss') + (isSudden ? ' sudden' : '');
+            slot.textContent = kick.goal ? '✅' : '❌';
+            slot.title = `${i + 1}ª cobrança: ${kick.player || 'Atleta'}`;
+          } else {
+            slot.className = 'kick-slot' + (isSudden ? ' sudden' : '');
+            slot.textContent = i + 1;
+            slot.style.color = '#64748b';
+            slot.style.fontSize = '0.72rem';
+          }
+          wrap.appendChild(slot);
+        }
+      });
+
+      const badge = document.getElementById('penaltyStatusBadge');
+      const hint = document.getElementById('penRoundHint');
+      if (penA.length <= 5 && penB.length <= 5) {
+        const remA = 5 - penA.length;
+        const remB = 5 - penB.length;
+        hint.textContent = 'Série de 5 cobranças';
+        if (goalsA > goalsB + remB) {
+          badge.textContent = `🏆 ${state.teams.A.name} VENCEU NOS PÊNALTIS!`;
+          badge.style.color = '#34d399';
+        } else if (goalsB > goalsA + remA) {
+          badge.textContent = `🏆 ${state.teams.B.name} VENCEU NOS PÊNALTIS!`;
+          badge.style.color = '#34d399';
+        } else {
+          badge.textContent = 'Série Inicial (5 cobranças)';
+          badge.style.color = '#fbbf24';
+        }
+      } else {
+        hint.textContent = 'Cobranças Alternadas';
+        if (penA.length === penB.length && goalsA !== goalsB) {
+          const winner = goalsA > goalsB ? state.teams.A.name : state.teams.B.name;
+          badge.textContent = `🏆 ${winner} VENCEU NAS ALTERNADAS!`;
+          badge.style.color = '#34d399';
+        } else {
+          badge.textContent = '⚡ Morte Súbita (Alternadas)';
+          badge.style.color = '#f59e0b';
+        }
+      }
+    }
+
+    // =========================================================================
+    // SCORE, EVENTS & MODALS
+    // =========================================================================
+    function renderScoreButtons() {
+      const cfg = SPORTS[state.sport];
+      ['A', 'B'].forEach(teamKey => {
+        const container = document.getElementById('scoreControls' + teamKey);
+        container.innerHTML = '';
+        cfg.scoreButtons.forEach(btnCfg => {
+          const btn = document.createElement('button');
+          btn.className = 'btn-score ' + (btnCfg.minus ? 'minus' : `primary-${teamKey.toLowerCase()}`);
+          btn.textContent = btnCfg.label;
+          btn.onclick = () => handleScoreClick(teamKey, btnCfg.pts);
+          container.appendChild(btn);
+        });
+      });
+    }
+
+    function handleScoreClick(teamKey, pts) {
+      if (pts < 0) {
+        state.teams[teamKey].score = Math.max(0, state.teams[teamKey].score + pts);
+        updateUI();
+        saveState();
+        return;
+      }
+
+      if (state.askAthlete) {
+        openAthleteModal({
+          team: teamKey,
+          kind: 'score',
+          pts: pts
+        });
+      } else {
+        commitEvent({
+          team: teamKey,
+          kind: 'score',
+          pts: pts,
+          playerNum: '',
+          playerName: '',
+          skill: state.sport === 'volei' ? 'Ponto' : ''
+        });
+      }
+    }
+
+    function triggerCardPrompt(teamKey, cardColor) {
+      if (state.askAthlete) {
+        openAthleteModal({
+          team: teamKey,
+          kind: 'card',
+          cardColor: cardColor
+        });
+      } else {
+        commitEvent({
+          team: teamKey,
+          kind: 'card',
+          cardColor: cardColor,
+          playerNum: '',
+          playerName: ''
+        });
+      }
+    }
+
+    function adjustTimerSeconds(deltaSec) {
+      state.timerSeconds = Math.max(0, state.timerSeconds + deltaSec);
+      updateTimerUI();
+      saveState();
+    }
+
+    function openTimerEditModal() {
+      stopTimer();
+      const mins = Math.floor(state.timerSeconds / 60);
+      const secs = state.timerSeconds % 60;
+      document.getElementById('editTimerMin').value = mins;
+      document.getElementById('editTimerSec').value = secs;
+      document.getElementById('editTimeoutDuration').value = SPORTS[state.sport].timeoutDuration;
+      document.getElementById('timerEditModal').classList.add('open');
+      setTimeout(() => document.getElementById('editTimerMin').select(), 60);
+    }
+
+    function closeTimerEditModal() {
+      document.getElementById('timerEditModal').classList.remove('open');
+    }
+
+    function setModalPresetTime(m, s) {
+      document.getElementById('editTimerMin').value = m;
+      document.getElementById('editTimerSec').value = s;
+    }
+
+    function applyTimerEdit() {
+      const m = Math.max(0, parseInt(document.getElementById('editTimerMin').value, 10) || 0);
+      const s = Math.min(59, Math.max(0, parseInt(document.getElementById('editTimerSec').value, 10) || 0));
+      const newTotalSec = m * 60 + s;
+
+      state.timerSeconds = newTotalSec;
+      if (document.getElementById('chkSaveAsDefault').checked) {
+        state.customPeriodSeconds = newTotalSec;
+      }
+
+      const toDur = parseInt(document.getElementById('editTimeoutDuration').value, 10);
+      if (toDur && toDur >= 5) {
+        SPORTS[state.sport].timeoutDuration = toDur;
+      }
+
+      closeTimerEditModal();
+      updateUI();
+      saveState();
+    }
+
+    function adjustShotClock(delta) {
+      state.shotClock = Math.max(0, state.shotClock + delta);
+      updateTimerUI();
+      saveState();
+    }
+
+    function requestTeamTimeout(teamKey) {
+      const cfg = SPORTS[state.sport];
+      const teamObj = state.teams[teamKey];
+
+      if (teamObj.timeouts >= cfg.maxTimeouts) {
+        if (!confirm(`${teamObj.name} já atingiu o limite de ${cfg.maxTimeouts} pedido(s) de tempo neste ${cfg.periodName.toLowerCase()}. Deseja conceder mesmo assim?`)) {
+          return;
+        }
+      }
+
+      stopTimer();
+      commitEvent({
+        team: teamKey,
+        kind: 'timeout',
+        pts: 0,
+        playerNum: '',
+        playerName: ''
+      });
+      startTimeoutCountdown(teamKey, cfg.timeoutDuration);
+    }
+
+    function changeTimeout(teamKey, delta) {
+      state.teams[teamKey].timeouts = Math.max(0, state.teams[teamKey].timeouts + delta);
+      updateUI();
+      saveState();
+    }
+
+    function startTimeoutCountdown(teamKey, seconds) {
+      clearInterval(timeoutInterval);
+      state.timeoutRunning = true;
+      state.timeoutTeam = teamKey;
+      state.timeoutSecondsLeft = seconds;
+
+      const box = document.getElementById('timeoutActiveBox');
+      document.getElementById('timeoutTeamLabel').textContent = `⏱ TEMPO TÉCNICO — ${state.teams[teamKey].name}`;
+      document.getElementById('timeoutTimerDisplay').textContent = formatTime(state.timeoutSecondsLeft);
+      box.classList.add('show');
+
+      timeoutInterval = setInterval(() => {
+        if (state.timeoutSecondsLeft > 0) {
+          state.timeoutSecondsLeft -= 1;
+          document.getElementById('timeoutTimerDisplay').textContent = formatTime(state.timeoutSecondsLeft);
+        } else {
+          playSound('buzzer');
+          stopTimeoutCountdown();
+        }
+      }, 1000);
+    }
+
+    function stopTimeoutCountdown() {
+      clearInterval(timeoutInterval);
+      state.timeoutRunning = false;
+      state.timeoutTeam = null;
+      document.getElementById('timeoutActiveBox').classList.remove('show');
+    }
+
+    function openAthleteModal(pending) {
+      state.pendingEvent = pending;
+      const modal = document.getElementById('athleteModal');
+      const title = document.getElementById('athleteModalTitle');
+      const teamName = state.teams[pending.team].name;
+
+      if (pending.kind === 'score') {
+        title.textContent = `${SPORTS[state.sport].icon} Confirmar +${pending.pts} (${teamName})`;
+      } else if (pending.kind === 'penalty') {
+        title.textContent = `🥅 Pênalti ${pending.isGoal ? 'CONVERTIDO ✅' : 'PERDIDO ❌'} (${teamName})`;
+      } else {
+        const label = pending.cardColor === 'yellow' ? '🟨 Cartão Amarelo' : '🟥 Cartão Vermelho';
+        title.textContent = `${label} (${teamName})`;
+      }
+
+      document.getElementById('inputPlayerNum').value = '';
+      document.getElementById('inputPlayerName').value = '';
+      document.getElementById('volleySkillWrap').style.display =
+        (state.sport === 'volei' && pending.kind === 'score') ? 'block' : 'none';
+
+      const chipsWrap = document.getElementById('quickRosterChips');
+      chipsWrap.innerHTML = '';
+      state.teams[pending.team].roster.forEach(p => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'roster-chip';
+        chip.textContent = `#${p.num} ${p.name}`;
+        chip.onclick = () => {
+          document.getElementById('inputPlayerNum').value = p.num;
+          document.getElementById('inputPlayerName').value = p.name;
+          confirmAthleteEvent(false);
+        };
+        chipsWrap.appendChild(chip);
+      });
+
+      modal.classList.add('open');
+      setTimeout(() => document.getElementById('inputPlayerNum').focus(), 60);
+    }
+
+    function closeAthleteModal() {
+      document.getElementById('athleteModal').classList.remove('open');
+      state.pendingEvent = null;
+    }
+
+    function selectVolleySkill(skill, btnEl) {
+      state.selectedVolleySkill = skill;
+      document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+
+    function confirmAthleteEvent(skipAthlete) {
+      if (!state.pendingEvent) return;
+      const p = state.pendingEvent;
+      const num = skipAthlete ? '' : document.getElementById('inputPlayerNum').value.trim();
+      const name = skipAthlete ? '' : document.getElementById('inputPlayerName').value.trim();
+
+      if (!skipAthlete && (num || name)) {
+        const roster = state.teams[p.team].roster;
+        const exists = roster.some(r => r.num === num && r.name.toLowerCase() === name.toLowerCase());
+        if (!exists) {
+          roster.push({ num: num || '-', name: name || 'Atleta' });
+        }
+      }
+
+      commitEvent({
+        team: p.team,
+        kind: p.kind,
+        pts: p.pts || 0,
+        isGoal: p.isGoal,
+        cardColor: p.cardColor || null,
+        playerNum: num,
+        playerName: name,
+        skill: state.sport === 'volei' && p.kind === 'score' ? state.selectedVolleySkill : ''
+      });
+
+      closeAthleteModal();
+    }
+
+    function commitEvent(ev) {
+      const teamObj = state.teams[ev.team];
+      const timeStr = formatTime(state.timerSeconds);
+      const periodStr = ev.kind === 'penalty' ? 'PÊNALTIS' : `${state.period}º ${SPORTS[state.sport].periodName}`;
+
+      if (ev.kind === 'score') {
+        teamObj.score += ev.pts;
+        if (state.sport === 'volei') state.serve = ev.team;
+        if (state.sport === 'basquete') state.shotClock = 24;
+        playSound('whistle');
+      } else if (ev.kind === 'card') {
+        teamObj[ev.cardColor] += 1;
+        playSound('whistle');
+      } else if (ev.kind === 'timeout') {
+        teamObj.timeouts += 1;
+        playSound('buzzer');
+      } else if (ev.kind === 'penalty') {
+        if (!teamObj.penalties) teamObj.penalties = [];
+        const athStr = (ev.playerNum || ev.playerName)
+          ? `${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}`
+          : '';
+        teamObj.penalties.push({ goal: !!ev.isGoal, player: athStr });
+        playSound(ev.isGoal ? 'whistle' : 'buzzer');
+      }
+
+      const newEvent = {
+        id: Date.now() + Math.random(),
+        team: ev.team,
+        teamName: teamObj.name,
+        kind: ev.kind,
+        pts: ev.pts || 0,
+        isGoal: !!ev.isGoal,
+        cardColor: ev.cardColor || null,
+        playerNum: ev.playerNum || '',
+        playerName: ev.playerName || '',
+        skill: ev.skill || '',
+        time: timeStr,
+        period: periodStr,
+        scoreSnapshot: `${state.teams.A.score} x ${state.teams.B.score}`
+      };
+
+      state.events.unshift(newEvent);
+      showLowerThird(newEvent);
+      updateUI();
+      saveState();
+    }
+
+    function undoEvent(eventId) {
+      const idx = state.events.findIndex(e => e.id === eventId);
+      if (idx === -1) return;
+      const ev = state.events[idx];
+      const teamObj = state.teams[ev.team];
+      if (ev.kind === 'score') {
+        teamObj.score = Math.max(0, teamObj.score - ev.pts);
+      } else if (ev.kind === 'card') {
+        teamObj[ev.cardColor] = Math.max(0, teamObj[ev.cardColor] - 1);
+      } else if (ev.kind === 'timeout') {
+        teamObj.timeouts = Math.max(0, teamObj.timeouts - 1);
+        stopTimeoutCountdown();
+      } else if (ev.kind === 'penalty') {
+        teamObj.penalties.pop();
+      }
+      state.events.splice(idx, 1);
+      updateUI();
+      saveState();
+    }
+
+    function showLowerThird(ev) {
+      const lt = document.getElementById('lowerThird');
+      const icon = document.getElementById('ltIcon');
+      const sub = document.getElementById('ltSubtitle');
+      const title = document.getElementById('ltTitle');
+
+      const athleteLabel = (ev.playerNum || ev.playerName)
+        ? `${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName || 'ATLETA'}`
+        : ev.teamName;
+
+      if (ev.kind === 'score') {
+        icon.textContent = SPORTS[state.sport].icon;
+        sub.textContent = `${ev.teamName} • +${ev.pts} (${ev.scoreSnapshot})`;
+        title.textContent = athleteLabel + (ev.skill ? ` • ${ev.skill}` : '');
+      } else if (ev.kind === 'timeout') {
+        icon.textContent = '⏱';
+        sub.textContent = `PEDIDO DE TEMPO TÉCNICO • ${ev.period}`;
+        title.textContent = `${ev.teamName} (${SPORTS[state.sport].timeoutDuration}s)`;
+      } else if (ev.kind === 'penalty') {
+        icon.textContent = ev.isGoal ? '✅' : '❌';
+        sub.textContent = `PÊNALTI ${ev.isGoal ? 'CONVERTIDO' : 'PERDIDO'} • ${ev.teamName}`;
+        title.textContent = athleteLabel;
+      } else {
+        icon.textContent = ev.cardColor === 'yellow' ? '🟨' : '🟥';
+        sub.textContent = `CARTÃO ${ev.cardColor === 'yellow' ? 'AMARELO' : 'VERMELHO'} • ${ev.teamName}`;
+        title.textContent = athleteLabel;
+      }
+
+      lt.classList.add('active');
+      clearTimeout(window.ltTimeout);
+      window.ltTimeout = setTimeout(() => lt.classList.remove('active'), 3600);
+    }
+
+    function changeFouls(teamKey, delta) {
+      state.teams[teamKey].fouls = Math.max(0, state.teams[teamKey].fouls + delta);
+      updateUI();
+      saveState();
+    }
+
+    function changeCard(teamKey, color, delta) {
+      state.teams[teamKey][color] = Math.max(0, state.teams[teamKey][color] + delta);
+      updateUI();
+      saveState();
+    }
+
+    function setServe(teamKey) {
+      state.serve = teamKey;
+      updateUI();
+      saveState();
+    }
+
+    function finishVolleySet() {
+      const a = state.teams.A.score;
+      const b = state.teams.B.score;
+      if (a === 0 && b === 0) return;
+
+      state.setsHistory.push({ set: state.period, scoreA: a, scoreB: b });
+      if (a > b) state.teams.A.sets += 1;
+      else if (b > a) state.teams.B.sets += 1;
+
+      state.teams.A.score = 0;
+      state.teams.B.score = 0;
+      state.teams.A.timeouts = 0;
+      state.teams.B.timeouts = 0;
+      stopTimeoutCountdown();
+      if (state.period < 5) state.period += 1;
+      playSound('buzzer');
+      updateUI();
+      saveState();
+    }
+
+    function toggleTimer() {
+      if (state.running) {
+        stopTimer();
+      } else {
+        stopTimeoutCountdown();
+        state.running = true;
+        timerInterval = setInterval(() => {
+          if (state.countdown) {
+            if (state.timerSeconds > 0) {
+              state.timerSeconds -= 1;
+            } else {
+              playSound('buzzer');
+              stopTimer();
+            }
+          } else {
+            state.timerSeconds += 1;
+          }
+
+          if (state.sport === 'basquete' && state.running) {
+            if (state.shotClock > 0) state.shotClock -= 1;
+            else playSound('buzzer');
+          }
+          updateTimerUI();
+          if (state.timerSeconds % 5 === 0) saveState();
+        }, 1000);
+      }
+      updateTimerUI();
+    }
+
+    function stopTimer() {
+      state.running = false;
+      clearInterval(timerInterval);
+      updateTimerUI();
+      saveState();
+    }
+
+    function resetPeriodTimer() {
+      stopTimer();
+      state.timerSeconds = state.customPeriodSeconds;
+      state.shotClock = 24;
+      updateTimerUI();
+      saveState();
+    }
+
+    function changePeriod(delta) {
+      const maxP = SPORTS[state.sport].maxPeriods;
+      state.period = Math.min(maxP, Math.max(1, state.period + delta));
+      if (state.sport === 'futsal' || state.sport === 'basquete') {
+        state.teams.A.fouls = 0;
+        state.teams.B.fouls = 0;
+      }
+      state.teams.A.timeouts = 0;
+      state.teams.B.timeouts = 0;
+      stopTimeoutCountdown();
+      updateUI();
+      saveState();
+    }
+
+    function addStoppageTime(mins) {
+      state.stoppageMinutes = Math.max(0, state.stoppageMinutes + mins);
+      updateUI();
+      saveState();
+    }
+
+    function toggleTimerDirection() {
+      state.countdown = !state.countdown;
+      updateUI();
+      saveState();
+    }
+
+    function resetShotClock(sec) {
+      state.shotClock = sec;
+      updateTimerUI();
+      saveState();
+    }
+
+    function swapTeams() {
+      const temp = state.teams.A;
+      state.teams.A = state.teams.B;
+      state.teams.B = temp;
+
+      const tempImg = loadedShieldImages.A;
+      loadedShieldImages.A = loadedShieldImages.B;
+      loadedShieldImages.B = tempImg;
+
+      document.getElementById('nameA').value = state.teams.A.name;
+      document.getElementById('nameB').value = state.teams.B.name;
+      document.getElementById('colorA').value = state.teams.A.color;
+      document.getElementById('colorB').value = state.teams.B.color;
+      document.getElementById('cardTeamA').style.borderTopColor = state.teams.A.color;
+      document.getElementById('cardTeamB').style.borderTopColor = state.teams.B.color;
+      updateUI();
+      saveState();
+    }
+
+    function openResetModal() {
+      document.getElementById('resetModal').classList.add('open');
+    }
+
+    function closeResetModal() {
+      document.getElementById('resetModal').classList.remove('open');
+    }
+
+    function executeReset(resetAll) {
+      stopTimer();
+      stopTimeoutCountdown();
+      ['A', 'B'].forEach(k => {
+        state.teams[k].score = 0;
+        state.teams[k].sets = 0;
+        state.teams[k].fouls = 0;
+        state.teams[k].timeouts = 0;
+        state.teams[k].yellow = 0;
+        state.teams[k].red = 0;
+        state.teams[k].penalties = [];
+        if (resetAll) {
+          state.teams[k].roster = [];
+          state.teams[k].shieldData = '';
+          state.teams[k].shieldEmoji = '';
+          loadedShieldImages[k] = null;
+        }
+      });
+      state.events = [];
+      state.setsHistory = [];
+      state.period = 1;
+      state.stoppageMinutes = 0;
+      state.timerSeconds = state.customPeriodSeconds;
+      state.refereeReport.status = 'Partida Normal (Sem incidentes)';
+      state.refereeReport.notes = '';
+      if (resetAll) {
+        state.refereeReport.auxReferee = '';
+        state.refereeReport.tableOfficial = '';
+        localStorage.removeItem(STORAGE_KEY);
+      }
+      closeResetModal();
+      updateUI();
+      saveState();
+    }
+
+    // ROSTER MODAL (BULK + INDIVIDUAL)
+    function openRosterModal(teamKey) {
+      state.activeRosterTeam = teamKey;
+      document.getElementById('rosterModalTitle').textContent = `📋 Elenco — ${state.teams[teamKey].name}`;
+      document.getElementById('rosterStatusMsg').textContent = '';
+      renderRosterManageList();
+      document.getElementById('rosterModal').classList.add('open');
+    }
+
+    function closeRosterModal() {
+      document.getElementById('rosterModal').classList.remove('open');
+      updateUI();
+      saveState();
+    }
+
+    function parsePlayerLine(rawLine) {
+      let line = rawLine.trim();
+      if (!line) return null;
+      line = line.replace(/^[•*]\s*/, '').trim();
+
+      const matchStart = line.match(/^#?(\d{1,3})\s*[-–—.:,;|/)]*\s*(.+)$/);
+      if (matchStart) {
+        return { num: matchStart[1].trim(), name: matchStart[2].trim() };
+      }
+
+      const matchEnd = line.match(/^(.+?)\s*[-–—.:,|/]*\s*#?(\d{1,3})$/);
+      if (matchEnd) {
+        return { num: matchEnd[2].trim(), name: matchEnd[1].trim() };
+      }
+
+      if (/^\d{1,3}$/.test(line)) {
+        return { num: line, name: `Atleta ${line}` };
+      }
+
+      return { num: '-', name: line };
+    }
+
+    function addBulkPlayersToRoster(replaceExisting = false) {
+      const rawText = document.getElementById('bulkRosterInput').value;
+      if (!rawText || !rawText.trim()) {
+        document.getElementById('rosterStatusMsg').textContent = '⚠️ Digite ou cole pelo menos 1 linha com número e nome.';
+        return;
+      }
+
+      const lines = rawText.split(/\r?\n|;/);
+      const parsedPlayers = [];
+      lines.forEach(line => {
+        const p = parsePlayerLine(line);
+        if (p) parsedPlayers.push(p);
+      });
+
+      if (parsedPlayers.length === 0) return;
+
+      const teamRoster = state.teams[state.activeRosterTeam].roster;
+      if (replaceExisting) teamRoster.length = 0;
+
+      let addedCount = 0;
+      parsedPlayers.forEach(p => {
+        const exists = teamRoster.some(
+          r => r.num === p.num && r.name.toLowerCase() === p.name.toLowerCase()
+        );
+        if (!exists) {
+          teamRoster.push(p);
+          addedCount += 1;
+        }
+      });
+
+      document.getElementById('bulkRosterInput').value = '';
+      document.getElementById('rosterStatusMsg').textContent = replaceExisting
+        ? `✅ Elenco atualizado com ${addedCount} atleta(s)!`
+        : `✅ ${addedCount} atleta(s) adicionado(s) de uma vez!`;
+
+      renderRosterManageList();
+      updateUI();
+      saveState();
+    }
+
+    function addPlayerToRoster() {
+      const num = document.getElementById('rosterNumInput').value.trim();
+      const name = document.getElementById('rosterNameInput').value.trim();
+      if (!num && !name) return;
+      state.teams[state.activeRosterTeam].roster.push({
+        num: num || '-',
+        name: name || 'Atleta'
+      });
+      document.getElementById('rosterNumInput').value = '';
+      document.getElementById('rosterNameInput').value = '';
+      document.getElementById('rosterStatusMsg').textContent = '✅ Atleta adicionado!';
+      renderRosterManageList();
+      updateUI();
+      saveState();
+    }
+
+    function renderRosterManageList() {
+      const wrap = document.getElementById('rosterManageList');
+      const roster = state.teams[state.activeRosterTeam].roster;
+      document.getElementById('rosterModalCountLabel').textContent = `Atletas Cadastrados (${roster.length})`;
+
+      wrap.innerHTML = '';
+      if (roster.length === 0) {
+        wrap.innerHTML = '<span style="font-size:0.8rem;color:var(--text-secondary);">Nenhum atleta cadastrado nesta equipe.</span>';
+        return;
+      }
+
+      roster.forEach((p, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'roster-chip';
+        chip.innerHTML = `#${p.num} ${p.name} <span style="margin-left:6px;color:#f87171;" onclick="removeRosterPlayer(${idx})">✕</span>`;
+        wrap.appendChild(chip);
+      });
+    }
+
+    function removeRosterPlayer(idx) {
+      state.teams[state.activeRosterTeam].roster.splice(idx, 1);
+      renderRosterManageList();
+      updateUI();
+      saveState();
+    }
+
+    function clearEntireRoster() {
+      const teamName = state.teams[state.activeRosterTeam].name;
+      if (!confirm(`Deseja remover todos os atletas cadastrados no elenco de ${teamName}?`)) return;
+      state.teams[state.activeRosterTeam].roster = [];
+      document.getElementById('rosterStatusMsg').textContent = '🗑️ Elenco limpo!';
+      renderRosterManageList();
+      updateUI();
+      saveState();
+    }
+
+    function copyRosterToClipboard() {
+      const roster = state.teams[state.activeRosterTeam].roster;
+      if (roster.length === 0) return;
+      const text = roster.map(p => `${p.num} ${p.name}`).join('\n');
+      if (window.AndroidBridge && window.AndroidBridge.copyText) {
+        window.AndroidBridge.copyText(text);
+      } else {
+        navigator.clipboard.writeText(text);
+      }
+      document.getElementById('rosterStatusMsg').textContent = '📋 Lista do elenco copiada!';
+    }
+
+    function formatTime(totalSec) {
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      const disp = document.getElementById('timerDisplay');
+      disp.textContent = formatTime(state.timerSeconds);
+      disp.className = 'timer-digits ' + (state.running ? 'running' : 'paused');
+
+      const btn = document.getElementById('btnStartPause');
+      btn.textContent = state.running ? '⏸ PAUSAR' : '▶ INICIAR';
+
+      document.getElementById('shotclockDisplay').textContent = state.shotClock;
+    }
+
+    function updateUI() {
+      const cfg = SPORTS[state.sport];
+
+      document.getElementById('periodLabel').textContent = `${state.period}º ${cfg.periodName}`;
+      document.getElementById('scoreA').textContent = state.teams.A.score;
+      document.getElementById('scoreB').textContent = state.teams.B.score;
+      document.getElementById('foulsA').textContent = state.teams.A.fouls;
+      document.getElementById('foulsB').textContent = state.teams.B.fouls;
+      document.getElementById('timeoutsA').textContent = `${state.teams.A.timeouts}/${cfg.maxTimeouts}`;
+      document.getElementById('timeoutsB').textContent = `${state.teams.B.timeouts}/${cfg.maxTimeouts}`;
+      document.getElementById('yellowA').textContent = state.teams.A.yellow;
+      document.getElementById('yellowB').textContent = state.teams.B.yellow;
+      document.getElementById('redA').textContent = state.teams.A.red;
+      document.getElementById('redB').textContent = state.teams.B.red;
+
+      document.getElementById('rosterCountA').textContent = state.teams.A.roster.length;
+      document.getElementById('rosterCountB').textContent = state.teams.B.roster.length;
+
+      updateShieldUI('A');
+      updateShieldUI('B');
+
+      const isVolley = state.sport === 'volei';
+      const isBasket = state.sport === 'basquete';
+      const isFutebol = state.sport === 'futebol';
+
+      document.getElementById('setsPillA').style.display = isVolley ? 'block' : 'none';
+      document.getElementById('setsPillB').style.display = isVolley ? 'block' : 'none';
+      document.getElementById('setsA').textContent = state.teams.A.sets;
+      document.getElementById('setsB').textContent = state.teams.B.sets;
+
+      document.getElementById('serveA').classList.toggle('active', isVolley && state.serve === 'A');
+      document.getElementById('serveB').classList.toggle('active', isVolley && state.serve === 'B');
+      document.getElementById('setsHistoryBar').style.display = isVolley ? 'flex' : 'none';
+      document.getElementById('shotclockPanel').style.display = isBasket ? 'block' : 'none';
+      document.getElementById('btnAddMinute').style.display = isFutebol ? 'inline-flex' : 'none';
+      document.getElementById('btnReduceMinute').style.display = (isFutebol && state.stoppageMinutes > 0) ? 'inline-flex' : 'none';
+
+      const addedBadge = document.getElementById('addedTimeBadge');
+      addedBadge.style.display = (isFutebol && state.stoppageMinutes > 0) ? 'block' : 'none';
+      addedBadge.textContent = `+${state.stoppageMinutes}' ACRÉSCIMO`;
+
+      document.getElementById('btnTimerDirection').textContent = state.countdown ? '⏳ Regressivo' : '⏱ Progressivo';
+
+      ['A', 'B'].forEach(k => {
+        const dotsWrap = document.getElementById('foulDots' + k);
+        dotsWrap.innerHTML = '';
+        if (cfg.foulLimit) {
+          for (let i = 1; i <= cfg.foulLimit; i++) {
+            const dot = document.createElement('span');
+            const f = state.teams[k].fouls;
+            dot.className = 'foul-dot ' + (i <= f ? (i === cfg.foulLimit ? 'danger' : 'filled') : '');
+            dotsWrap.appendChild(dot);
+          }
+        }
+
+        const toDotsWrap = document.getElementById('timeoutDots' + k);
+        toDotsWrap.innerHTML = '';
+        for (let i = 1; i <= cfg.maxTimeouts; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'foul-dot ' + (i <= state.teams[k].timeouts ? 'cyan' : '');
+          toDotsWrap.appendChild(dot);
+        }
+      });
+
+      if (isVolley) {
+        const list = document.getElementById('setsChipsList');
+        if (state.setsHistory.length === 0) {
+          list.innerHTML = '<span style="font-size:0.75rem;color:var(--text-secondary);">Sem sets finalizados</span>';
+        } else {
+          list.innerHTML = state.setsHistory
+            .map(s => `<span class="set-chip">${s.set}º Set: ${s.scoreA} x ${s.scoreB}</span>`)
+            .join('');
+        }
+      }
+
+      const alertBanner = document.getElementById('alertBanner');
+      alertBanner.className = 'alert-banner';
+      if (state.sport === 'futsal' && (state.teams.A.fouls >= 5 || state.teams.B.fouls >= 5)) {
+        const t = state.teams.A.fouls >= 5 ? state.teams.A.name : state.teams.B.name;
+        alertBanner.textContent = `🚨 ALERTA FUTSAL: ${t} ATINGIU A 5ª FALTA COLETIVA (TIRO LIVRE DIRETO SEM BARREIRA!)`;
+        alertBanner.style.background = 'rgba(239, 68, 68, 0.24)';
+        alertBanner.style.border = '1px solid #ef4444';
+        alertBanner.classList.add('show');
+      } else if (state.sport === 'basquete' && (state.teams.A.fouls >= 5 || state.teams.B.fouls >= 5)) {
+        const t = state.teams.A.fouls >= 5 ? state.teams.A.name : state.teams.B.name;
+        alertBanner.textContent = `🏀 BÔNUS DE LANCES LIVRES: ${t} ESTOUROU O LIMITE DE FALTAS DO QUARTO!`;
+        alertBanner.style.background = 'rgba(245, 158, 11, 0.22)';
+        alertBanner.style.border = '1px solid #f59e0b';
+        alertBanner.classList.add('show');
+      }
+
+      renderRefereePreview();
+      renderPenaltiesUI();
+      updateTimerUI();
+      renderStatsAndTimeline();
+    }
+
+    function renderStatsAndTimeline() {
+      document.getElementById('statsHeaderA').textContent = state.teams.A.name;
+      document.getElementById('statsHeaderB').textContent = state.teams.B.name;
+      document.getElementById('eventsCountLabel').textContent = `${state.events.length} lance(s)`;
+
+      ['A', 'B'].forEach(k => {
+        const box = document.getElementById('scorersBox' + k);
+        const statList = document.getElementById('playerStats' + k);
+        const teamEvents = state.events.filter(e => e.team === k && e.kind !== 'timeout');
+
+        const playerMap = {};
+        teamEvents.forEach(e => {
+          const key = (e.playerNum || e.playerName)
+            ? `${e.playerNum ? '#' + e.playerNum + ' ' : ''}${e.playerName || 'Atleta'}`
+            : 'Sem identificação';
+          if (!playerMap[key]) playerMap[key] = { pts: 0, yellow: 0, red: 0, pen: 0 };
+          if (e.kind === 'score') playerMap[key].pts += e.pts;
+          else if (e.cardColor === 'yellow') playerMap[key].yellow += 1;
+          else if (e.cardColor === 'red') playerMap[key].red += 1;
+          else if (e.kind === 'penalty' && e.isGoal) playerMap[key].pen += 1;
+        });
+
+        const entries = Object.entries(playerMap);
+        if (entries.length === 0) {
+          box.innerHTML = '<span style="opacity:0.55;">Nenhum lance registrado ainda</span>';
+          statList.innerHTML = '<div style="font-size:0.78rem;color:var(--text-secondary);">Sem registros</div>';
+        } else {
+          box.innerHTML = entries
+            .filter(([, v]) => v.pts > 0)
+            .map(([name, v]) => `<span class="scorer-chip"><strong>${name}</strong> (${v.pts})</span>`)
+            .join('') || '<span style="opacity:0.55;">Sem gols/pontos</span>';
+
+          statList.innerHTML = entries
+            .sort((a, b) => b[1].pts - a[1].pts)
+            .map(([name, v]) => `
+              <div class="player-stat-row">
+                <span><strong>${name}</strong></span>
+                <span>
+                  ${v.pts > 0 ? `<b style="color:#34d399;">${v.pts} pts/gols</b> ` : ''}
+                  ${v.pen > 0 ? `🥅${v.pen} ` : ''}
+                  ${v.yellow > 0 ? `🟨${v.yellow} ` : ''}
+                  ${v.red > 0 ? `🟥${v.red}` : ''}
+                </span>
+              </div>
+            `).join('');
+        }
+      });
+
+      const tl = document.getElementById('timelineList');
+      if (state.events.length === 0) {
+        tl.innerHTML = `
+          <div style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:20px 0;">
+            Os gols, pontos, pedidos de tempo, pênaltis e cartões aparecerão aqui.
+          </div>`;
+      } else {
+        tl.innerHTML = state.events.map(ev => {
+          let badgeIcon = SPORTS[state.sport].icon;
+          let desc = '';
+
+          if (ev.kind === 'score') {
+            const athlete = (ev.playerNum || ev.playerName)
+              ? `<strong>${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}</strong>`
+              : '<em>Atleta não informado</em>';
+            desc = `+${ev.pts} (${ev.teamName}) — ${athlete} ${ev.skill ? `[${ev.skill}]` : ''}`;
+          } else if (ev.kind === 'timeout') {
+            badgeIcon = '⏱';
+            desc = `<strong>Pedido de Tempo Técnico</strong> — ${ev.teamName}`;
+          } else if (ev.kind === 'penalty') {
+            badgeIcon = ev.isGoal ? '✅' : '❌';
+            const athlete = (ev.playerNum || ev.playerName)
+              ? `<strong>${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}</strong>`
+              : '<em>Batedor não informado</em>';
+            desc = `Pênalti ${ev.isGoal ? 'Convertido' : 'Perdido'} (${ev.teamName}) — ${athlete}`;
+          } else {
+            badgeIcon = ev.cardColor === 'yellow' ? '🟨' : '🟥';
+            const athlete = (ev.playerNum || ev.playerName)
+              ? `<strong>${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}</strong>`
+              : '<em>Atleta não informado</em>';
+            desc = `Cartão ${ev.cardColor === 'yellow' ? 'Amarelo' : 'Vermelho'} (${ev.teamName}) — ${athlete}`;
+          }
+
+          return `
+            <div class="timeline-item">
+              <div class="timeline-meta">
+                <span class="badge-time">${ev.time} • ${ev.period}</span>
+                <span>${badgeIcon} ${desc}</span>
+              </div>
+              <button class="btn-mini" title="Desfazer lance" onclick="undoEvent(${ev.id})">↩️</button>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // =========================================================================
+    // OFFICIAL PDF GENERATOR (WITH REFEREE REPORT SECTION) & ANDROID BRIDGE
+    // =========================================================================
+
+    function openPdfModal() {
+      document.getElementById('pdfStatusMsg').textContent = '';
+      if (state.refereeReport.mainReferee) {
+        document.getElementById('metaReferee').value = state.refereeReport.mainReferee;
+      }
+      renderSumulaCanvas();
+      document.getElementById('pdfModal').classList.add('open');
+    }
+
+    function closePdfModal() {
+      document.getElementById('pdfModal').classList.remove('open');
+    }
+
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+      const paragraphs = (text || '').split(/\r?\n/);
+      let linesDrawn = 0;
+
+      for (let p = 0; p < paragraphs.length; p++) {
+        const words = paragraphs[p].split(/\s+/);
+        let currentLine = '';
+
+        for (let n = 0; n < words.length; n++) {
+          const testLine = currentLine ? currentLine + ' ' + words[n] : words[n];
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && currentLine) {
+            ctx.fillText(currentLine, x, y + linesDrawn * lineHeight);
+            linesDrawn++;
+            if (linesDrawn >= maxLines) return;
+            currentLine = words[n];
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) {
+          ctx.fillText(currentLine, x, y + linesDrawn * lineHeight);
+          linesDrawn++;
+          if (linesDrawn >= maxLines) return;
+        }
+      }
+    }
+
+    function renderSumulaCanvas() {
+      const canvas = document.getElementById('sumulaCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+
+      const cfg = SPORTS[state.sport];
+      const tourney = document.getElementById('metaTourney').value || 'Partida Oficial';
+      const venue = document.getElementById('metaVenue').value || 'Arena Esportiva';
+      const referee = document.getElementById('metaReferee').value || state.refereeReport.mainReferee || 'Arbitragem Oficial';
+      const nowStr = new Date().toLocaleString('pt-BR');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      // Header Banner
+      const grad = ctx.createLinearGradient(0, 0, W, 172);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, 172);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(0, 172, W, 7);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 21px Inter, sans-serif';
+      ctx.fillText('ARENASCORE PRO • SÚMULA OFICIAL E RELATÓRIO DA PARTIDA', 50, 48);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px Inter, sans-serif';
+      ctx.fillText(`${cfg.icon} ${cfg.name.toUpperCase()} — ${tourney.toUpperCase()}`, 50, 98);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '500 19px Inter, sans-serif';
+      ctx.fillText(`Local: ${venue}   |   Data/Hora: ${nowStr}   |   Árbitro: ${referee}`, 50, 142);
+
+      // Scoreboard Box
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2;
+      roundRect(ctx, 50, 202, W - 100, 192, 16, true, true);
+
+      // Team A
+      ctx.fillStyle = state.teams.A.color || '#2563eb';
+      ctx.fillRect(50, 202, 14, 192);
+      drawTeamShieldOnPdf(ctx, 'A', 82, 228, 68);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 29px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(state.teams.A.name.substring(0, 16), 164, 260);
+      ctx.font = '600 17px Inter, sans-serif';
+      ctx.fillStyle = '#475569';
+      ctx.fillText(`Faltas: ${state.teams.A.fouls} | Tempos: ${state.teams.A.timeouts}/${cfg.maxTimeouts} | CA: ${state.teams.A.yellow} | CV: ${state.teams.A.red}`, 82, 336);
+      if (state.sport === 'volei') {
+        ctx.fillText(`Sets Vencidos: ${state.teams.A.sets}`, 82, 368);
+      }
+
+      // Center Score + Penalties
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 68px JetBrains Mono, monospace';
+      ctx.fillText(`${state.teams.A.score}  ×  ${state.teams.B.score}`, W / 2, 290);
+
+      const penA = state.teams.A.penalties || [];
+      const penB = state.teams.B.penalties || [];
+      if (penA.length > 0 || penB.length > 0) {
+        const gA = penA.filter(p => p.goal).length;
+        const gB = penB.filter(p => p.goal).length;
+        ctx.font = 'bold 21px Inter, sans-serif';
+        ctx.fillStyle = '#d97706';
+        ctx.fillText(`PÊNALTIS: (${gA})  ×  (${gB})`, W / 2, 330);
+      }
+
+      ctx.font = 'bold 18px Inter, sans-serif';
+      ctx.fillStyle = '#059669';
+      ctx.fillText(`PERÍODO: ${state.period}º ${cfg.periodName} (${formatTime(state.timerSeconds)})`, W / 2, 370);
+
+      // Team B
+      ctx.fillStyle = state.teams.B.color || '#dc2626';
+      ctx.fillRect(W - 64, 202, 14, 192);
+      drawTeamShieldOnPdf(ctx, 'B', W - 150, 228, 68);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 29px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(state.teams.B.name.substring(0, 16), W - 164, 260);
+      ctx.font = '600 17px Inter, sans-serif';
+      ctx.fillStyle = '#475569';
+      ctx.fillText(`Faltas: ${state.teams.B.fouls} | Tempos: ${state.teams.B.timeouts}/${cfg.maxTimeouts} | CA: ${state.teams.B.yellow} | CV: ${state.teams.B.red}`, W - 82, 336);
+      if (state.sport === 'volei') {
+        ctx.fillText(`Sets Vencidos: ${state.teams.B.sets}`, W - 82, 368);
+      }
+
+      ctx.textAlign = 'left';
+      let curY = 428;
+
+      if (state.sport === 'volei' && state.setsHistory.length > 0) {
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 20px Inter, sans-serif';
+        ctx.fillText('PARCIAIS DOS SETS:', 50, curY);
+        ctx.font = '600 19px Inter, sans-serif';
+        ctx.fillStyle = '#334155';
+        const setsTxt = state.setsHistory.map(s => `${s.set}º Set: ${s.scoreA}x${s.scoreB}`).join('   |   ');
+        ctx.fillText(setsTxt, 275, curY);
+        curY += 36;
+      }
+
+      // SECTION 1: ESTATÍSTICAS INDIVIDUAIS
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 22px Inter, sans-serif';
+      ctx.fillText('1. ESTATÍSTICAS INDIVIDUAIS E ARTILHARIA POR EQUIPE', 50, curY);
+      curY += 14;
+
+      const colW = (W - 130) / 2;
+      ['A', 'B'].forEach((k, idx) => {
+        const colX = 50 + idx * (colW + 30);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.strokeStyle = '#cbd5e1';
+        roundRect(ctx, colX, curY, colW, 232, 12, true, true);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 20px Inter, sans-serif';
+        ctx.fillText(`${state.teams[k].name}`, colX + 18, curY + 32);
+
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.beginPath();
+        ctx.moveTo(colX + 14, curY + 42);
+        ctx.lineTo(colX + colW - 14, curY + 42);
+        ctx.stroke();
+
+        const pMap = {};
+        state.events.filter(e => e.team === k && e.kind !== 'timeout').forEach(e => {
+          const label = (e.playerNum || e.playerName)
+            ? `${e.playerNum ? '#' + e.playerNum + ' ' : ''}${e.playerName || 'Atleta'}`
+            : 'Não identificado';
+          if (!pMap[label]) pMap[label] = { pts: 0, y: 0, r: 0 };
+          if (e.kind === 'score') pMap[label].pts += e.pts;
+          if (e.cardColor === 'yellow') pMap[label].y += 1;
+          if (e.cardColor === 'red') pMap[label].r += 1;
+        });
+
+        const rows = Object.entries(pMap).sort((a, b) => b[1].pts - a[1].pts).slice(0, 5);
+        if (rows.length === 0) {
+          ctx.fillStyle = '#64748b';
+          ctx.font = 'italic 17px Inter, sans-serif';
+          ctx.fillText('Nenhum lance nominal registrado.', colX + 18, curY + 80);
+        } else {
+          rows.forEach(([pName, st], rIdx) => {
+            const ry = curY + 72 + rIdx * 32;
+            ctx.fillStyle = '#1e293b';
+            ctx.font = '600 17px Inter, sans-serif';
+            ctx.fillText(pName.substring(0, 24), colX + 18, ry);
+
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 17px Inter, sans-serif';
+            const rightTxt = `${st.pts} pts/gols  |  CA:${st.y}  CV:${st.r}`;
+            ctx.fillText(rightTxt, colX + colW - 18, ry);
+            ctx.textAlign = 'left';
+          });
+        }
+      });
+
+      curY += 268;
+
+      // SECTION 2: LINHA DO TEMPO
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 22px Inter, sans-serif';
+      ctx.fillText('2. LINHA DO TEMPO E REGISTRO CRONOLÓGICO DE LANCES', 50, curY);
+      curY += 14;
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#cbd5e1';
+      roundRect(ctx, 50, curY, W - 100, 420, 12, true, true);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(52, curY + 2, W - 104, 40);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 17px Inter, sans-serif';
+      ctx.fillText('TEMPO / PERÍODO', 72, curY + 27);
+      ctx.fillText('EQUIPE', 290, curY + 27);
+      ctx.fillText('OCORRÊNCIA', 540, curY + 27);
+      ctx.fillText('ATLETA / DETALHE', 810, curY + 27);
+      ctx.fillText('PLACAR', 1100, curY + 27);
+
+      const chronological = [...state.events].reverse().slice(0, 10);
+      if (chronological.length === 0) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = 'italic 19px Inter, sans-serif';
+        ctx.fillText('Nenhum evento registrado na linha do tempo até o momento.', 72, curY + 86);
+      } else {
+        chronological.forEach((ev, idx) => {
+          const ry = curY + 70 + idx * 34;
+          if (idx % 2 === 1) {
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(54, ry - 22, W - 108, 32);
+          }
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '600 16px Inter, sans-serif';
+          ctx.fillText(`${ev.time} (${ev.period})`, 72, ry);
+          ctx.fillText(ev.teamName.substring(0, 16), 290, ry);
+
+          let kindTxt = '';
+          let ath = '';
+          if (ev.kind === 'score') {
+            kindTxt = `+${ev.pts} ${ev.skill ? '(' + ev.skill + ')' : 'Gol/Ponto'}`;
+            ath = (ev.playerNum || ev.playerName)
+              ? `${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}`
+              : 'Não informado';
+          } else if (ev.kind === 'timeout') {
+            kindTxt = 'Pedido de Tempo';
+            ath = `Tempo Técnico (${SPORTS[state.sport].timeoutDuration}s)`;
+          } else if (ev.kind === 'penalty') {
+            kindTxt = `Pênalti ${ev.isGoal ? 'CONVERTIDO' : 'PERDIDO'}`;
+            ath = (ev.playerNum || ev.playerName)
+              ? `${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}`
+              : 'Não informado';
+          } else {
+            kindTxt = `Cartão ${ev.cardColor === 'yellow' ? 'Amarelo' : 'Vermelho'}`;
+            ath = (ev.playerNum || ev.playerName)
+              ? `${ev.playerNum ? '#' + ev.playerNum + ' ' : ''}${ev.playerName}`
+              : 'Não informado';
+          }
+
+          ctx.fillText(kindTxt, 540, ry);
+          ctx.fillText(ath.substring(0, 22), 810, ry);
+          ctx.fillText(ev.scoreSnapshot, 1100, ry);
+        });
+      }
+
+      curY += 455;
+
+      // SECTION 3: RELATÓRIO DA ARBITRAGEM & OCORRÊNCIAS
+      const rep = state.refereeReport;
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 22px Inter, sans-serif';
+      ctx.fillText('3. RELATÓRIO DA ARBITRAGEM E OBSERVAÇÕES DISCIPLINARES', 50, curY);
+      curY += 14;
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#94a3b8';
+      roundRect(ctx, 50, curY, W - 100, 260, 12, true, true);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(52, curY + 2, W - 104, 42);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px Inter, sans-serif';
+      const auxTxt = rep.auxReferee ? `   |   2º Árbitro/Aux.: ${rep.auxReferee}` : '';
+      const tabTxt = rep.tableOfficial ? `   |   Mesário: ${rep.tableOfficial}` : '';
+      ctx.fillText(`Árbitro Principal: ${referee}${auxTxt}${tabTxt}`.substring(0, 95), 70, curY + 28);
+
+      ctx.fillStyle = '#0369a1';
+      ctx.font = 'bold 17px Inter, sans-serif';
+      ctx.fillText(`Situação da Partida: ${rep.status || 'Partida Normal (Sem incidentes)'}`, 70, curY + 72);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = '500 17px Inter, sans-serif';
+      const reportBody = rep.notes
+        ? rep.notes
+        : 'Partida transcorreu sem ocorrências extras relatadas pela equipe de arbitragem.';
+      drawWrappedText(ctx, reportBody, 70, curY + 106, W - 140, 26, 5);
+
+      // Signatures Footer
+      const sigY = H - 98;
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+
+      const sigW = 310;
+      const positions = [90, 465, 840];
+      const labels = [
+        `Capitão: ${state.teams.A.name}`,
+        `Capitão: ${state.teams.B.name}`,
+        `Árbitro Principal: ${referee}`
+      ];
+
+      positions.forEach((px, i) => {
+        ctx.beginPath();
+        ctx.moveTo(px, sigY);
+        ctx.lineTo(px + sigW, sigY);
+        ctx.stroke();
+        ctx.fillStyle = '#334155';
+        ctx.font = '600 16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i].substring(0, 34), px + sigW / 2, sigY + 24);
+      });
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 14px Inter, sans-serif';
+      ctx.fillText('Documento gerado eletronicamente pelo aplicativo ArenaScore Pro.', W / 2, H - 22);
+      ctx.textAlign = 'left';
+    }
+
+    function drawTeamShieldOnPdf(ctx, teamKey, x, y, size) {
+      const t = state.teams[teamKey];
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = t.color || '#cbd5e1';
+      ctx.lineWidth = 3;
+      roundRect(ctx, x, y, size, size, 14, true, true);
+
+      if (loadedShieldImages[teamKey]) {
+        ctx.drawImage(loadedShieldImages[teamKey], x + 4, y + 4, size - 8, size - 8);
+      } else if (t.shieldEmoji) {
+        ctx.font = '34px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.shieldEmoji, x + size / 2, y + size / 2 + 12);
+      } else {
+        ctx.fillStyle = t.color || '#0f172a';
+        ctx.font = 'bold 24px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(getTeamInitials(t.name), x + size / 2, y + size / 2 + 8);
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function buildPdfData() {
+      renderSumulaCanvas();
+      const canvas = document.getElementById('sumulaCanvas');
+      const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      const base64 = jpegDataUrl.split(',')[1];
+      const jpegBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const pageW = 595.28;
+      const pageH = 841.89;
+
+      const encoder = new TextEncoder();
+      const chunks = [];
+      const offsets = [];
+      let byteLength = 0;
+
+      function pushStr(str) {
+        const b = encoder.encode(str);
+        chunks.push(b);
+        byteLength += b.length;
+      }
+
+      function pushBytes(b) {
+        chunks.push(b);
+        byteLength += b.length;
+      }
+
+      function startObj(id) {
+        offsets[id] = byteLength;
+        pushStr(`${id} 0 obj\n`);
+      }
+
+      pushStr('%PDF-1.4\n%\xFF\xFF\xFF\xFF\n');
+
+      startObj(1);
+      pushStr('<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+
+      startObj(2);
+      pushStr('<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+
+      startObj(3);
+      pushStr(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+
+      startObj(4);
+      pushStr(`<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+      pushBytes(jpegBytes);
+      pushStr('\nendstream\nendobj\n');
+
+      const contentStream = `q\n${pageW} 0 0 ${pageH} 0 0 cm\n/Im0 Do\nQ\n`;
+      startObj(5);
+      pushStr(`<< /Length ${contentStream.length} >>\nstream\n${contentStream}endstream\nendobj\n`);
+
+      const xrefOffset = byteLength;
+      pushStr('xref\n0 6\n0000000000 65535 f \n');
+      for (let i = 1; i <= 5; i++) {
+        pushStr(String(offsets[i]).padStart(10, '0') + ' 00000 n \n');
+      }
+
+      pushStr(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+      const pdfBytes = new Uint8Array(byteLength);
+      let pos = 0;
+      for (const chunk of chunks) {
+        pdfBytes.set(chunk, pos);
+        pos += chunk.length;
+      }
+
+      let binary = '';
+      const step = 0x8000;
+      for (let i = 0; i < pdfBytes.length; i += step) {
+        binary += String.fromCharCode.apply(null, pdfBytes.subarray(i, i + step));
+      }
+
+      return {
+        blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+        base64: btoa(binary)
+      };
+    }
+
+    function getPdfFilename() {
+      const cleanA = state.teams.A.name.replace(/[^a-zA-Z0-9]/g, '_');
+      const cleanB = state.teams.B.name.replace(/[^a-zA-Z0-9]/g, '_');
+      return `Sumula_${cleanA}_x_${cleanB}.pdf`;
+    }
+
+    function downloadPdfFile() {
+      const { blob, base64 } = buildPdfData();
+      const filename = getPdfFilename();
+
+      if (window.AndroidBridge && window.AndroidBridge.savePdf) {
+        window.AndroidBridge.savePdf(base64, filename);
+        document.getElementById('pdfStatusMsg').textContent = `✅ Súmula enviada para Downloads: "${filename}"`;
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      document.getElementById('pdfStatusMsg').textContent = `✅ PDF "${filename}" baixado com sucesso!`;
+    }
+
+    async function sharePdfFile() {
+      const { blob, base64 } = buildPdfData();
+      const filename = getPdfFilename();
+      const shareText = buildWhatsAppText();
+
+      if (window.AndroidBridge && window.AndroidBridge.sharePdf) {
+        window.AndroidBridge.sharePdf(base64, filename, shareText);
+        document.getElementById('pdfStatusMsg').textContent = '📲 Abrindo menu de compartilhamento do Android...';
+        return;
+      }
+
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      const title = `Súmula Oficial: ${state.teams.A.name} ${state.teams.A.score} x ${state.teams.B.score} ${state.teams.B.name}`;
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ title, text: shareText, files: [file] });
+          document.getElementById('pdfStatusMsg').textContent = '✅ PDF compartilhado com sucesso!';
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      downloadPdfFile();
+      document.getElementById('pdfStatusMsg').textContent =
+        '📥 O PDF foi baixado no seu aparelho! Agora basta anexá-lo no WhatsApp.';
+    }
+
+    function buildWhatsAppText() {
+      const cfg = SPORTS[state.sport];
+      const tourney = document.getElementById('metaTourney').value || 'Partida Oficial';
+      const rep = state.refereeReport;
+
+      let lines = [
+        `🏆 *${tourney.toUpperCase()}* (${cfg.icon} ${cfg.name})`,
+        `📊 *PLACAR FINAL:* ${state.teams.A.name} *${state.teams.A.score}* x *${state.teams.B.score}* ${state.teams.B.name}`,
+        `⏱ Período: ${state.period}º ${cfg.periodName} | Faltas: ${state.teams.A.fouls} x ${state.teams.B.fouls} | Tempos: ${state.teams.A.timeouts} x ${state.teams.B.timeouts}`
+      ];
+
+      const penA = state.teams.A.penalties || [];
+      const penB = state.teams.B.penalties || [];
+      if (penA.length > 0 || penB.length > 0) {
+        const gA = penA.filter(p => p.goal).length;
+        const gB = penB.filter(p => p.goal).length;
+        lines.push(`🥅 *PÊNALTIS:* ${state.teams.A.name} *${gA}* x *${gB}* ${state.teams.B.name}`);
+      }
+
+      if (state.sport === 'volei' && state.setsHistory.length > 0) {
+        lines.push(`🏐 Sets: ` + state.setsHistory.map(s => `${s.scoreA}x${s.scoreB}`).join(', '));
+      }
+
+      if (state.events.length > 0) {
+        lines.push(`\n⚡ *LANCES E ARTILHARIA:*`);
+        [...state.events].reverse().forEach(e => {
+          const ath = (e.playerNum || e.playerName)
+            ? `${e.playerNum ? '#' + e.playerNum + ' ' : ''}${e.playerName}`
+            : 'Atleta';
+          if (e.kind === 'score') {
+            lines.push(`• ${e.time} (${e.teamName}): +${e.pts} - *${ath}*`);
+          } else if (e.kind === 'timeout') {
+            lines.push(`• ${e.time} (${e.teamName}): ⏱ *Pedido de Tempo Técnico*`);
+          } else if (e.kind === 'penalty') {
+            lines.push(`• Pênalti (${e.teamName}): ${e.isGoal ? '✅' : '❌'} *${ath}*`);
+          } else {
+            const cIcon = e.cardColor === 'yellow' ? '🟨' : '🟥';
+            lines.push(`• ${e.time} (${e.teamName}): ${cIcon} *${ath}*`);
+          }
+        });
+      }
+
+      if (rep && (rep.notes || rep.mainReferee)) {
+        lines.push(`\n📝 *RELATÓRIO DA ARBITRAGEM:*`);
+        if (rep.mainReferee) lines.push(`• Árbitro: ${rep.mainReferee}`);
+        if (rep.status) lines.push(`• Situação: ${rep.status}`);
+        if (rep.notes) lines.push(`• Observações: ${rep.notes}`);
+      }
+
+      return lines.join('\n');
+    }
+
+    function copyWhatsAppSummary() {
+      const text = buildWhatsAppText();
+      if (window.AndroidBridge && window.AndroidBridge.copyText) {
+        window.AndroidBridge.copyText(text);
+        document.getElementById('pdfStatusMsg').textContent = '📋 Resumo copiado! Agora é só colar no WhatsApp.';
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('pdfStatusMsg').textContent =
+          '📋 Resumo copiado! Agora é só colar no WhatsApp ou Instagram.';
+      });
+    }
+
+    window.addEventListener('keydown', e => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleTimer();
+      } else if (e.key.toLowerCase() === 'b') {
+        playSound('buzzer');
+      } else if (e.key.toLowerCase() === 's') {
+        swapTeams();
+      } else if (e.key.toLowerCase() === 'e') {
+        openTimerEditModal();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
