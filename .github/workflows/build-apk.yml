@@ -1,0 +1,50 @@
+name: Compilar APK Android (ArenaScore Pro)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK (assembleDebug)
+        run: gradle assembleDebug --no-daemon
+
+      - name: Renomear APK para ArenaScore-Pro.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk ArenaScore-Pro.apk
+
+      - name: Disponibilizar APK para Download (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArenaScore-Pro-APK
+          path: ArenaScore-Pro.apk
+          retention-days: 30
+
+      - name: Publicar Release (se houver tag v*)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ArenaScore-Pro.apk
