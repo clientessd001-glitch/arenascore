@@ -1,4 +1,4 @@
-name: Compilar APK Android (ArenaScore Pro)
+name: Compilar APK Android (Arena SSD Pro)
 
 on:
   push:
@@ -33,18 +33,18 @@ jobs:
       - name: Compilar APK (assembleDebug)
         run: gradle assembleDebug --no-daemon
 
-      - name: Renomear APK para ArenaScore-Pro.apk
-        run: cp app/build/outputs/apk/debug/app-debug.apk ArenaScore-Pro.apk
+      - name: Renomear APK para Arena-SSD-Pro.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk Arena-SSD-Pro.apk
 
       - name: Disponibilizar APK para Download (Artifacts)
         uses: actions/upload-artifact@v4
         with:
-          name: ArenaScore-Pro-APK
-          path: ArenaScore-Pro.apk
+          name: Arena-SSD-Pro-APK
+          path: Arena-SSD-Pro.apk
           retention-days: 30
 
       - name: Publicar Release (se houver tag v*)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: ArenaScore-Pro.apk
+          files: Arena-SSD-Pro.apk
