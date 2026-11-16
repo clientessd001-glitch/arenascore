@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 AlertDialog.Builder(this@MainActivity)
-                    .setTitle("Sair do ArenaScore Pro?")
+                    .setTitle("Sair do Arena SSD Pro?")
                     .setMessage("Os dados da partida, relatório da arbitragem e elencos já estão salvos automaticamente no aparelho.")
                     .setPositiveButton("Sair") { _, _ -> finish() }
                     .setNegativeButton("Continuar no Jogo", null)
@@ -179,7 +179,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                sharePdf(base64Data, cleanName, "Súmula Oficial ArenaScore Pro")
+                sharePdf(base64Data, cleanName, "Súmula Oficial Arena SSD Pro")
             } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         fun copyText(text: String) {
             runOnUiThread {
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("ArenaScore Resumo", text)
+                val clip = ClipData.newPlainText("Arena SSD Resumo", text)
                 clipboard.setPrimaryClip(clip)
                 Toast.makeText(
                     this@MainActivity,
