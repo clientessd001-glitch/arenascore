@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ArenaScore Pro — Placar Multiesportivo & Súmula Oficial PDF</title>
+  <title>Arena SSD Pro — Placar Multiesportivo & Súmula Oficial PDF</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
       --bg-main: #070b14;
       --bg-panel: #101726;
       --bg-panel-alt: #162033;
-      --bg-glass: rgba(16, 23, 38, 0.88);
+      --bg-glass: rgba(16, 23, 38, 0.92);
       --border-subtle: rgba(255, 255, 255, 0.09);
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
@@ -42,7 +42,7 @@
       background: radial-gradient(circle at 50% 0%, #172542 0%, var(--bg-main) 65%);
       color: var(--text-primary);
       min-height: 100vh;
-      padding-bottom: 48px;
+      padding-bottom: 56px;
       overflow-x: hidden;
     }
 
@@ -51,7 +51,7 @@
       position: sticky;
       top: 0;
       z-index: 40;
-      background: rgba(7, 11, 20, 0.92);
+      background: rgba(7, 11, 20, 0.94);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border-subtle);
       padding: 10px 16px;
@@ -59,7 +59,7 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
     }
 
     .brand {
@@ -68,7 +68,7 @@
       gap: 10px;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: 1.22rem;
       letter-spacing: 0.5px;
     }
 
@@ -178,6 +178,149 @@
       box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
     }
 
+    /* LANDSCAPE MENU BUTTON & DROPDOWN (MODO PAISAGEM) */
+    .landscape-menu-wrap {
+      display: none;
+      position: relative;
+    }
+
+    .btn-landscape-menu {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #34d399;
+      padding: 7px 14px;
+      border-radius: 9px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .landscape-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      width: 250px;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.78);
+      z-index: 85;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .landscape-dropdown.open {
+      display: flex;
+    }
+
+    .landscape-dropdown .btn-action {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+    }
+
+    /* AUTOMATICALLY COLLAPSE TOP BUTTONS INTO MENU IN LANDSCAPE MODE */
+    @media (orientation: landscape) and (max-height: 620px) {
+      .topbar {
+        padding: 6px 14px;
+        flex-wrap: nowrap;
+      }
+      .top-actions {
+        display: none !important;
+      }
+      .landscape-menu-wrap {
+        display: block;
+      }
+      .sport-tab {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* FLOATING MINI TIMER & SCORE BAR WHEN MAIN TIMER SCROLLS OUT OF VIEW */
+    .floating-timer-bar {
+      position: fixed;
+      top: 62px;
+      left: 50%;
+      transform: translate(-50%, -150%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 55;
+      background: rgba(11, 17, 30, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 999px;
+      padding: 7px 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      max-width: 96vw;
+    }
+
+    .floating-timer-bar.visible {
+      transform: translate(-50%, 0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .ft-score {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .ft-clock {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #34d399;
+      background: #050811;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+    }
+
+    .ft-clock.paused {
+      color: #fbbf24;
+    }
+
+    .ft-period {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .ft-btn {
+      border: none;
+      background: var(--accent-sport);
+      color: #04130d;
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .ft-btn.top-jump {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
     /* MAIN CONTAINER */
     .container {
       max-width: 1280px;
@@ -229,6 +372,15 @@
       }
     }
 
+    @media (orientation: landscape) and (max-height: 620px) {
+      .scoreboard-grid {
+        grid-template-columns: 1fr 290px 1fr;
+      }
+      .center-console {
+        order: 0;
+      }
+    }
+
     /* TEAM CARD */
     .team-card {
       background: linear-gradient(180deg, var(--bg-panel) 0%, #0b101d 100%);
@@ -266,7 +418,6 @@
       min-width: 0;
     }
 
-    /* TEAM SHIELD / BADGE BUTTON */
     .team-shield-btn {
       width: 48px;
       height: 48px;
@@ -952,6 +1103,25 @@
       font-size: 0.82rem;
     }
 
+    /* FOOTER CREDITS */
+    .app-footer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .app-footer button {
+      background: transparent;
+      border: none;
+      color: #34d399;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
     /* LOWER THIRD TV BANNER */
     .lower-third {
       position: fixed;
@@ -1116,7 +1286,6 @@
       color: #fff;
     }
 
-    /* SHIELD PRESET GALLERY */
     .shield-presets-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1138,6 +1307,40 @@
     .shield-preset-item:hover {
       border-color: var(--gold);
       background: rgba(245, 158, 11, 0.14);
+    }
+
+    /* ABOUT MODAL STYLING */
+    .about-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .about-dev-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .about-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .about-row:last-child {
+      border-bottom: none;
     }
 
     /* PDF PREVIEW AREA INSIDE MODAL */
@@ -1206,10 +1409,10 @@
 <body>
 
   <!-- TOP BAR -->
-  <header class="topbar">
+  <header class="topbar" id="mainTopbar">
     <div class="brand">
       <div class="brand-badge">🏆</div>
-      <span>ARENASCORE <small style="color:var(--accent-sport);font-size:0.75rem;">PRO</small></span>
+      <span>ARENA SSD <small style="color:var(--accent-sport);font-size:0.75rem;">PRO</small></span>
       <span class="autosave-pill" id="autosavePill">💾 Salvo</span>
     </div>
 
@@ -1220,14 +1423,15 @@
       <button class="sport-tab" data-sport="basquete">🏀 Basquete</button>
     </div>
 
-    <div class="top-actions">
+    <!-- BOTÕES COMPLETOS (MODO RETRATO / TELA GRANDE) -->
+    <div class="top-actions" id="desktopTopActions">
       <button class="btn-action active-toggle" id="btnToggleAthlete" title="Solicitar Número/Nome ao pontuar">
         👤 Atleta: ON
       </button>
       <button class="btn-action" id="btnTogglePenalties" title="Abrir/Fechar disputa de pênaltis ou tiros livres">
         🥅 Pênaltis
       </button>
-      <button class="btn-action btn-referee-highlight" id="btnOpenRefereeModal" title="Preencher Relatório da Arbitragem e Ocorrências">
+      <button class="btn-action btn-referee-highlight" id="btnOpenRefereeModal" title="Preencher Relatório da Arbitragem">
         📝 Arbitragem
       </button>
       <button class="btn-action" id="btnSwapSides" title="Inverter lados das equipes">
@@ -1242,8 +1446,54 @@
       <button class="btn-action" id="btnResetMatch" title="Opções de reinício">
         ↺ Reset
       </button>
+      <button class="btn-action" id="btnOpenAboutModal" title="Sobre o Arena SSD Pro">
+        ℹ️ Sobre
+      </button>
+    </div>
+
+    <!-- MENU RETRÁTIL AUTOMÁTICO PARA MODO PAISAGEM (HORIZONTAL) -->
+    <div class="landscape-menu-wrap" id="landscapeMenuWrap">
+      <button class="btn-landscape-menu" id="btnLandscapeMenu" onclick="toggleLandscapeMenu(event)">
+        ☰ Menu
+      </button>
+      <div class="landscape-dropdown" id="landscapeDropdown">
+        <button class="btn-action active-toggle" id="btnToggleAthleteLand" onclick="toggleAthleteMode(); closeLandscapeMenu();">
+          👤 Atleta: ON
+        </button>
+        <button class="btn-action" id="btnTogglePenaltiesLand" onclick="togglePenaltiesPanel(); closeLandscapeMenu();">
+          🥅 Disputa de Pênaltis
+        </button>
+        <button class="btn-action btn-referee-highlight" onclick="openRefereeModal(); closeLandscapeMenu();">
+          📝 Relatório da Arbitragem
+        </button>
+        <button class="btn-action" onclick="swapTeams(); closeLandscapeMenu();">
+          ⇄ Inverter Lados
+        </button>
+        <button class="btn-action" onclick="playSound('buzzer'); closeLandscapeMenu();">
+          🔊 Tocar Buzina
+        </button>
+        <button class="btn-action btn-pdf-highlight" onclick="openPdfModal(); closeLandscapeMenu();">
+          📄 Gerar PDF / Compartilhar
+        </button>
+        <button class="btn-action" onclick="openResetModal(); closeLandscapeMenu();">
+          ↺ Resetar Partida
+        </button>
+        <button class="btn-action" onclick="openAboutModal(); closeLandscapeMenu();">
+          ℹ️ Sobre o App
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- BARRA FLUTUANTE DO TEMPO E PLACAR QUANDO ROLAR A PÁGINA -->
+  <div class="floating-timer-bar" id="floatingTimerBar">
+    <span class="ft-score" id="ftTeamA">ELITE FJU 0</span>
+    <span class="ft-clock paused" id="ftClock" onclick="openTimerEditModal()" title="Toque para editar tempo">45:00</span>
+    <span class="ft-score" id="ftTeamB">0 VISITANTE</span>
+    <span class="ft-period" id="ftPeriod">1º TEMPO</span>
+    <button class="ft-btn" id="ftPlayPauseBtn" onclick="toggleTimer()">▶ Iniciar</button>
+    <button class="ft-btn top-jump" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Voltar ao topo">⬆️</button>
+  </div>
 
   <main class="container">
     <!-- DYNAMIC ALERT BANNER -->
@@ -1323,14 +1573,14 @@
       </div>
 
       <!-- CENTER CONSOLE -->
-      <div class="center-console">
+      <div class="center-console" id="centerConsole">
         <div class="period-selector">
           <button class="btn-mini" onclick="changePeriod(-1)">◀</button>
           <span class="period-title" id="periodLabel">1º TEMPO</span>
           <button class="btn-mini" onclick="changePeriod(1)">▶</button>
         </div>
 
-        <div class="timer-box" onclick="openTimerEditModal()" title="Clique para editar os minutos e segundos do cronômetro">
+        <div class="timer-box" id="mainTimerBox" onclick="openTimerEditModal()" title="Clique para editar os minutos e segundos do cronômetro">
           <span class="timer-edit-hint">✏️ Editar</span>
           <div class="timer-digits" id="timerDisplay">45:00</div>
           <div class="added-time-badge" id="addedTimeBadge">+0' ACRÉSCIMO</div>
@@ -1511,7 +1761,7 @@
       </div>
     </section>
 
-    <!-- RELATÓRIO DA ARBITRAGEM (BARRA DE RESUMO RÁPIDO) -->
+    <!-- RELATÓRIO DA ARBITRAGEM -->
     <section class="referee-preview-card">
       <div style="display:flex;align-items:flex-start;gap:12px;flex:1;">
         <div style="font-size:1.6rem;">📝</div>
@@ -1560,6 +1810,12 @@
         </div>
       </div>
     </section>
+
+    <!-- RODAPÉ DE CRÉDITOS -->
+    <footer class="app-footer">
+      <strong>Arena SSD Pro</strong> • Desenvolvido por <strong>Josimar Sousa</strong> — <strong>SSD Soluções</strong> •
+      <button onclick="openAboutModal()">Sobre o Aplicativo</button>
+    </footer>
   </main>
 
   <!-- LOWER THIRD TV NOTIFICATION -->
@@ -1568,6 +1824,53 @@
     <div>
       <div style="font-size:0.74rem;font-weight:800;color:var(--accent-sport);text-transform:uppercase;" id="ltSubtitle">GOL CONFIRMADO</div>
       <div style="font-family:'Chakra Petch',sans-serif;font-size:1.15rem;font-weight:700;" id="ltTitle">#10 ATLETA</div>
+    </div>
+  </div>
+
+  <!-- MODAL: SOBRE O APLICATIVO (DESENVOLVEDOR JOSIMAR SOUSA & SSD SOLUÇÕES) -->
+  <div class="modal-backdrop" id="aboutModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="panel-title">ℹ️ Sobre o Arena SSD Pro</div>
+        <button class="btn-mini" onclick="closeAboutModal()">✕</button>
+      </div>
+
+      <div class="about-hero">
+        <div style="font-size:2.6rem;margin-bottom:6px;">🏆</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:1.45rem;font-weight:800;color:#fff;">
+          ARENA SSD <span style="color:var(--accent-sport);">PRO</span>
+        </div>
+        <div style="font-size:0.8rem;color:#94a3b8;margin-top:4px;">
+          Sistema Profissional de Placar Eletrônico, Arbitragem e Súmulas em PDF • Versão 1.2
+        </div>
+      </div>
+
+      <div class="about-dev-card">
+        <div class="about-row">
+          <span style="color:var(--text-secondary);">Desenvolvedor</span>
+          <strong style="color:#f8fafc;">Josimar Sousa</strong>
+        </div>
+        <div class="about-row">
+          <span style="color:var(--text-secondary);">Empresa / Marca</span>
+          <strong style="color:#34d399;">SSD Soluções</strong>
+        </div>
+        <div class="about-row">
+          <span style="color:var(--text-secondary);">Modalidades</span>
+          <strong>Futebol, Futsal, Vôlei e Basquete</strong>
+        </div>
+        <div class="about-row">
+          <span style="color:var(--text-secondary);">Recursos Integrados</span>
+          <strong>Súmula PDF, Pênaltis, Elenco & Auto-Save</strong>
+        </div>
+      </div>
+
+      <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin-bottom:16px;text-align:center;">
+        Desenvolvido para campeonatos, arenas esportivas, projetos sociais e eventos oficiais com operação 100% offline e geração instantânea de súmulas compartilháveis.
+      </p>
+
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="btn-action btn-pdf-highlight" onclick="closeAboutModal()">Fechar</button>
+      </div>
     </div>
   </div>
 
@@ -1878,7 +2181,7 @@
         </div>
         <div>
           <label style="font-size:0.74rem;color:var(--text-secondary);">Árbitro Principal</label>
-          <input type="text" id="metaReferee" class="input-field" value="Coordenação Projeto FJU 3.5" oninput="syncRefereeFromPdfMeta()" />
+          <input type="text" id="metaReferee" class="input-field" value="Josimar Sousa / Arbitragem" oninput="syncRefereeFromPdfMeta()" />
         </div>
       </div>
 
@@ -1903,7 +2206,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'arenascore_pro_state_v2';
+    const STORAGE_KEY = 'arenassd_pro_state_v3';
 
     const SPORTS = {
       futebol: {
@@ -1994,10 +2297,10 @@
       meta: {
         tourney: 'Copa / Amistoso Oficial',
         venue: 'Areninha / Ginásio',
-        referee: 'Coordenação Projeto FJU 3.5'
+        referee: 'Josimar Sousa'
       },
       refereeReport: {
-        mainReferee: 'Coordenação Projeto FJU 3.5',
+        mainReferee: 'Josimar Sousa',
         auxReferee: '',
         tableOfficial: '',
         status: 'Partida Normal (Sem incidentes)',
@@ -2047,6 +2350,69 @@
     const loadedShieldImages = { A: null, B: null };
 
     // =========================================================================
+    // MENU PAISAGEM (LANDSCAPE DROPDOWN) & BARRA FLUTUANTE DE ROLAGEM
+    // =========================================================================
+    function toggleLandscapeMenu(e) {
+      if (e) e.stopPropagation();
+      const dd = document.getElementById('landscapeDropdown');
+      dd.classList.toggle('open');
+    }
+
+    function closeLandscapeMenu() {
+      document.getElementById('landscapeDropdown')?.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('landscapeMenuWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        closeLandscapeMenu();
+      }
+    });
+
+    function setupFloatingTimerObserver() {
+      const timerBox = document.getElementById('mainTimerBox');
+      const floatingBar = document.getElementById('floatingTimerBar');
+      const topbar = document.getElementById('mainTopbar');
+      if (!timerBox || !floatingBar) return;
+
+      const updateTopOffset = () => {
+        if (topbar) {
+          floatingBar.style.top = (topbar.offsetHeight + 8) + 'px';
+        }
+      };
+      updateTopOffset();
+      window.addEventListener('resize', updateTopOffset);
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              floatingBar.classList.toggle('visible', !entry.isIntersecting);
+            });
+          },
+          { threshold: 0.1 }
+        );
+        observer.observe(timerBox);
+      } else {
+        window.addEventListener('scroll', () => {
+          const rect = timerBox.getBoundingClientRect();
+          floatingBar.classList.toggle('visible', rect.bottom < 60);
+        }, { passive: true });
+      }
+    }
+
+    // =========================================================================
+    // MODAL SOBRE (DESENVOLVEDOR JOSIMAR SOUSA & SSD SOLUÇÕES)
+    // =========================================================================
+    function openAboutModal() {
+      document.getElementById('aboutModal').classList.add('open');
+    }
+
+    function closeAboutModal() {
+      document.getElementById('aboutModal').classList.remove('open');
+    }
+
+    // =========================================================================
     // SALVAMENTO AUTOMÁTICO (LOCALSTORAGE)
     // =========================================================================
     function saveState() {
@@ -2092,7 +2458,7 @@
         Object.assign(state, saved);
         if (!state.refereeReport) {
           state.refereeReport = {
-            mainReferee: state.meta?.referee || '',
+            mainReferee: state.meta?.referee || 'Josimar Sousa',
             auxReferee: '',
             tableOfficial: '',
             status: 'Partida Normal (Sem incidentes)',
@@ -2115,9 +2481,7 @@
           document.getElementById('metaReferee').value = state.refereeReport.mainReferee || state.meta.referee || '';
         }
 
-        const btnAth = document.getElementById('btnToggleAthlete');
-        btnAth.textContent = state.askAthlete ? '👤 Atleta: ON' : '👤 Atleta: OFF';
-        btnAth.classList.toggle('active-toggle', state.askAthlete);
+        syncAthleteToggleButtons();
 
         document.querySelectorAll('.sport-tab').forEach(b => {
           b.classList.toggle('active', b.dataset.sport === state.sport);
@@ -2129,6 +2493,26 @@
       } catch (e) {
         return false;
       }
+    }
+
+    function syncAthleteToggleButtons() {
+      const label = state.askAthlete ? '👤 Atleta: ON' : '👤 Atleta: OFF';
+      const btn1 = document.getElementById('btnToggleAthlete');
+      const btn2 = document.getElementById('btnToggleAthleteLand');
+      if (btn1) {
+        btn1.textContent = label;
+        btn1.classList.toggle('active-toggle', state.askAthlete);
+      }
+      if (btn2) {
+        btn2.textContent = label;
+        btn2.classList.toggle('active-toggle', state.askAthlete);
+      }
+    }
+
+    function toggleAthleteMode() {
+      state.askAthlete = !state.askAthlete;
+      syncAthleteToggleButtons();
+      saveState();
     }
 
     // AUDIO SYNTHESIZER
@@ -2165,26 +2549,21 @@
         btn.addEventListener('click', () => switchSport(btn.dataset.sport));
       });
 
-      document.getElementById('btnToggleAthlete').addEventListener('click', () => {
-        state.askAthlete = !state.askAthlete;
-        const btn = document.getElementById('btnToggleAthlete');
-        btn.textContent = state.askAthlete ? '👤 Atleta: ON' : '👤 Atleta: OFF';
-        btn.classList.toggle('active-toggle', state.askAthlete);
-        saveState();
-      });
-
+      document.getElementById('btnToggleAthlete').addEventListener('click', toggleAthleteMode);
       document.getElementById('btnTogglePenalties').addEventListener('click', togglePenaltiesPanel);
       document.getElementById('btnOpenRefereeModal').addEventListener('click', openRefereeModal);
       document.getElementById('btnSwapSides').addEventListener('click', swapTeams);
       document.getElementById('btnBuzzer').addEventListener('click', () => playSound('buzzer'));
       document.getElementById('btnOpenPdfModal').addEventListener('click', openPdfModal);
       document.getElementById('btnResetMatch').addEventListener('click', openResetModal);
+      document.getElementById('btnOpenAboutModal').addEventListener('click', openAboutModal);
 
       document.getElementById('nameA').addEventListener('input', e => {
         state.teams.A.name = e.target.value.toUpperCase() || 'EQUIPE A';
         updateShieldUI('A');
         renderStatsAndTimeline();
         renderPenaltiesUI();
+        updateFloatingBarUI();
         saveState();
       });
       document.getElementById('nameB').addEventListener('input', e => {
@@ -2192,6 +2571,7 @@
         updateShieldUI('B');
         renderStatsAndTimeline();
         renderPenaltiesUI();
+        updateFloatingBarUI();
         saveState();
       });
 
@@ -2215,6 +2595,8 @@
       } else {
         switchSport('futebol');
       }
+
+      setupFloatingTimerObserver();
     }
 
     function switchSport(sportKey) {
@@ -2422,6 +2804,7 @@
       state.penaltiesOpen = !state.penaltiesOpen;
       document.getElementById('penaltiesPanel').classList.toggle('open', state.penaltiesOpen);
       document.getElementById('btnTogglePenalties').classList.toggle('active-toggle', state.penaltiesOpen);
+      document.getElementById('btnTogglePenaltiesLand')?.classList.toggle('active-toggle', state.penaltiesOpen);
       renderPenaltiesUI();
       saveState();
     }
@@ -2466,6 +2849,7 @@
       const panel = document.getElementById('penaltiesPanel');
       panel.classList.toggle('open', state.penaltiesOpen);
       document.getElementById('btnTogglePenalties').classList.toggle('active-toggle', state.penaltiesOpen);
+      document.getElementById('btnTogglePenaltiesLand')?.classList.toggle('active-toggle', state.penaltiesOpen);
 
       document.getElementById('penHeaderA').textContent = state.teams.A.name;
       document.getElementById('penHeaderB').textContent = state.teams.B.name;
@@ -3201,6 +3585,32 @@
       return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
+    function updateFloatingBarUI() {
+      const timeStr = formatTime(state.timerSeconds);
+      const ftClock = document.getElementById('ftClock');
+      const ftPlayBtn = document.getElementById('ftPlayPauseBtn');
+      const ftTeamA = document.getElementById('ftTeamA');
+      const ftTeamB = document.getElementById('ftTeamB');
+      const ftPeriod = document.getElementById('ftPeriod');
+
+      if (ftClock) {
+        ftClock.textContent = timeStr;
+        ftClock.classList.toggle('paused', !state.running);
+      }
+      if (ftPlayBtn) {
+        ftPlayBtn.textContent = state.running ? '⏸ Pausar' : '▶ Iniciar';
+      }
+      if (ftTeamA) {
+        ftTeamA.textContent = `${state.teams.A.name.substring(0, 10)} ${state.teams.A.score}`;
+      }
+      if (ftTeamB) {
+        ftTeamB.textContent = `${state.teams.B.score} ${state.teams.B.name.substring(0, 10)}`;
+      }
+      if (ftPeriod) {
+        ftPeriod.textContent = `${state.period}º ${SPORTS[state.sport].periodName}`;
+      }
+    }
+
     function updateTimerUI() {
       const disp = document.getElementById('timerDisplay');
       disp.textContent = formatTime(state.timerSeconds);
@@ -3210,6 +3620,7 @@
       btn.textContent = state.running ? '⏸ PAUSAR' : '▶ INICIAR';
 
       document.getElementById('shotclockDisplay').textContent = state.shotClock;
+      updateFloatingBarUI();
     }
 
     function updateUI() {
@@ -3404,7 +3815,7 @@
     }
 
     // =========================================================================
-    // OFFICIAL PDF GENERATOR (WITH REFEREE REPORT SECTION) & ANDROID BRIDGE
+    // OFFICIAL PDF GENERATOR (WITH REFEREE REPORT & ARENA SSD PRO BRANDING)
     // =========================================================================
 
     function openPdfModal() {
@@ -3475,7 +3886,7 @@
 
       ctx.fillStyle = '#f59e0b';
       ctx.font = 'bold 21px Inter, sans-serif';
-      ctx.fillText('ARENASCORE PRO • SÚMULA OFICIAL E RELATÓRIO DA PARTIDA', 50, 48);
+      ctx.fillText('ARENA SSD PRO • SÚMULA OFICIAL E RELATÓRIO DA PARTIDA', 50, 48);
 
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 36px Inter, sans-serif';
@@ -3682,7 +4093,7 @@
 
       curY += 455;
 
-      // SECTION 3: RELATÓRIO DA ARBITRAGEM & OCORRÊNCIAS
+      // SECTION 3: RELATÓRIO DA ARBITRAGEM
       const rep = state.refereeReport;
       ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 22px Inter, sans-serif';
@@ -3737,9 +4148,9 @@
       });
 
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 14px Inter, sans-serif';
-      ctx.fillText('Documento gerado eletronicamente pelo aplicativo ArenaScore Pro.', W / 2, H - 22);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 14px Inter, sans-serif';
+      ctx.fillText('Arena SSD Pro • Desenvolvido por Josimar Sousa — SSD Soluções', W / 2, H - 22);
       ctx.textAlign = 'left';
     }
 
@@ -3859,7 +4270,7 @@
     function getPdfFilename() {
       const cleanA = state.teams.A.name.replace(/[^a-zA-Z0-9]/g, '_');
       const cleanB = state.teams.B.name.replace(/[^a-zA-Z0-9]/g, '_');
-      return `Sumula_${cleanA}_x_${cleanB}.pdf`;
+      return `Sumula_ArenaSSD_${cleanA}_x_${cleanB}.pdf`;
     }
 
     function downloadPdfFile() {
@@ -3961,6 +4372,7 @@
         if (rep.notes) lines.push(`• Observações: ${rep.notes}`);
       }
 
+      lines.push(`\n_Gerado por Arena SSD Pro • Josimar Sousa (SSD Soluções)_`);
       return lines.join('\n');
     }
 
